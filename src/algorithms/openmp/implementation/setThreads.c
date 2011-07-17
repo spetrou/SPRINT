@@ -18,25 +18,58 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef _COMMANDS_H
-#define _COMMANDS_H
+#include <stdio.h>
+#include <stdarg.h>
+#include <mpi.h>
+#include <string.h>
+
+#include <R.h>
+#include <Rinternals.h>
+#include <R_ext/Rdynload.h>
+#include <Rdefines.h>
 
 /**
- * Lists all the functions available, ensure that TERMINATE is first and
- * LAST is last. If you add a command code you must add a command function
- * in sprint/functions.c
+ * A command used to set the number of OpenMP threads in all
+ * MPI hosts.
  **/
 
-enum commandCodes {TERMINATE = 0, PCOR, PMAXT, PPAM, PAPPLY, PRANDOMFOREST,
-                   PBOOT, PTEST, INIT_RNG, RESET_RNG, PBOOTRP, PBOOTRPMULTI,
-                   SETSPRINTOPENMPTHREADS,
-                   LAST};
+int setThreads(int n,...)
+{
+    int worldSize;
+    int worldRank;
+    va_list ap;
 
-/**
- * Stereotype for interface functions. You almost certainly don't need to
- * mess with this.
- **/
+    // An array of integers (as many elements as MPI processes)
+    // The sanity checks are perfmormed by the "interface".
+    int* numThreads = NULL;
+    int scatterNumThreads = 1;
 
-typedef int (*commandFunction)(int n,...);
+    MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
+    MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
 
-#endif
+    // master processor gathers results form slaves
+    if (worldRank == 0) {
+
+        // Get input variables
+        va_start(ap, n);
+        numThreads = va_arg(ap, int*);
+        va_end(ap);
+
+        // Scatter the number of threads each MPI process
+        // should be configured for.
+        MPI_Scatter(numThreads, 1, MPI_INTEGER,
+                    &scatterNumThreads, 1, MPI_INTEGER,
+                    0, MPI_COMM_WORLD);
+    } else {
+
+        MPI_Scatter(NULL, 1, MPI_INTEGER,
+                    &scatterNumThreads, 1, MPI_INTEGER,
+                    0, MPI_COMM_WORLD);
+    }
+
+    omp_set_num_threads(scatterNumThreads);
+
+    printf("\nProcess %d will spawn %d threads", worldRank, scatterNumThreads);
+    return 0;
+}
+

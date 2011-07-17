@@ -42,6 +42,7 @@ extern int init_rng_worker(int n, ...);
 extern int reset_rng_worker(int n, ...);
 extern int boot_rank_product(int n, ...);
 extern int boot_rank_product_multi(int n, ...);
+extern int setThreads(int n, ...);
 /**
  * This is a dummy operation which can be used where a command code exists
  * but does not represent a useful function.
@@ -71,5 +72,6 @@ commandFunction commandLUT[] = {voidCommand,
                                 reset_rng_worker,
                                 boot_rank_product,
                                 boot_rank_product_multi,
+                                setThreads,
                                 voidCommand};
 

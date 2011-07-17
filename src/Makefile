@@ -50,7 +50,7 @@ all: sprint.so
 
 sprint.so: $(INTERFACE_OBJS) $(SHARED_ALGORITHM_OBJS) $(SHLIB_OBJS) $(IMPLEMENTATION_OBJS)
 ifeq (mpicc,$(findstring mpicc,$(MPICC)))
-	$(MPICC) -shared -o $@ $^
+	$(MPICC) -shared -o $@ $^ $(PKG_LIBS)
 else
 	$(CC) -shared -o $@ $^ $(MPILIBS)
 endif
@@ -61,8 +61,7 @@ endif
 # * ****************************************** *
 
 $(SPRINT_OBJS) $(INTERFACE_OBJS) $(IMPLEMENTATION_OBJS) $(SHARED_ALGORITHM_OBJS) $(SHLIB_OBJS): %.o: %.c $(MAKEFILE)
-	$(MPICC) $(LOCAL_CFLAGS) -I$(R_INCLUDE_DIR) -c -o $@ $<
-
+	$(MPICC) $(LOCAL_CFLAGS) $(PKG_CFLAGS) -I$(R_INCLUDE_DIR) -c -o $@ $<
 
 # * ****************************** *
 # *  Clean up the build directory  *
