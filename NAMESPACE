@@ -16,6 +16,7 @@ export(pRPadvance)
 export(pRS)
 export(pRSadvance)
 export(sprint.setOpenMPThreads)
+export(sprint.MPI_WORLD_SIZE)
 
 ## generics
 S3method(print, pam)
