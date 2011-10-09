@@ -33,7 +33,7 @@ void cstat(int my_rank, int world_size, int my_start, int my_end, int n_clusters
            double *distance_matrix, int *ncluv, int *nelem, int *med, int *nisol)
 {
   int j, k, ja, jk, nplac, ksmal = -1/* -Wall */;
-    double ss = *s * 1.1 + 1.;
+  double ss = *s * 1.1 + 1.;
 
      int my_kk_start, my_kk_end;
 
@@ -79,7 +79,7 @@ void cstat(int my_rank, int world_size, int my_start, int my_end, int n_clusters
     }
     
     mMPI_AllgatherINT(nsend, world_size, my_rank, my_start, my_end,
-                   n_rows, MPI_COMM_WORLD);
+                      n_rows, MPI_COMM_WORLD);
   
     /* ncluv[j] := k , the cluster number  (k = 1..*kk) */
     jk = 1;
@@ -250,7 +250,7 @@ void cstat(int my_rank, int world_size, int my_start, int my_end, int n_clusters
           }
         }
         /* nel = 1 or (!kand) : */
-        nisol[k] = 0;
+        //nisol[k] = 0;
         
       } /* for(k) */
 
@@ -258,8 +258,8 @@ void cstat(int my_rank, int world_size, int my_start, int my_end, int n_clusters
                    n_clusters, MPI_COMM_WORLD);
       mMPI_AllgatherDOUBLE(separ, world_size, my_rank, my_kk_start, my_kk_end,
                    n_clusters, MPI_COMM_WORLD);
-      mMPI_AllgatherINT(nisol, world_size, my_rank, my_kk_start, my_kk_end,
-                   n_clusters, MPI_COMM_WORLD);
+//      mMPI_AllgatherINT(nisol, world_size, my_rank, my_kk_start, my_kk_end,
+//                   n_clusters, MPI_COMM_WORLD);
       mMPI_AllgatherINT(nrepr, world_size, my_rank, my_kk_start, my_kk_end,
                    n_clusters, MPI_COMM_WORLD);
 
