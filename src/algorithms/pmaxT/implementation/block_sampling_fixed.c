@@ -1,10 +1,10 @@
 
-#include "assert.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 static int local_n=0;
 static int local_perm_size=0;           /* The number of total simultaions      */
@@ -31,7 +31,7 @@ void create_sampling_block(int n, int *L, int B, int generator_flag, int initial
         }
     m++;
 
-    assert(local_L = (int *)calloc(n, sizeof(int)));
+    local_L = (int *)R_alloc(n, sizeof(int));
     local_perm_size = B;
     local_perm_count = 1;
     local_n = n;
@@ -73,7 +73,7 @@ void create_sampling_block(int n, int *L, int B, int generator_flag, int initial
         // Doing random permutation
         local_random_flag=1;
 
-        assert(l_order_block = (int *)calloc(n, sizeof(int)));
+        l_order_block = (int *)R_alloc(n, sizeof(int));
         init_label_block(l_order_block, n, m);
 
 
@@ -186,11 +186,9 @@ void sample_block(int *L, int n, int m)
  * **************************************************** */
 void delete_sampling_block(void)
 {
-    free(local_L);
     local_L = NULL;
 
     if ( l_order_block != NULL ) {
-        free(l_order_block);
         l_order_block = NULL;
     }
 }

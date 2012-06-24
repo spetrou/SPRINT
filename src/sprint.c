@@ -29,6 +29,7 @@
 #include "functions.h"
 #include <R.h>
 #include <R_ext/Rdynload.h>
+#include <Rinterface.h>
 #include <Rembedded.h>
 
 extern commandFunction commandLUT[];
@@ -175,6 +176,8 @@ void worker() {
 
     R_CleanTempDir();
     exit(0);
+
+    return;
 
 }
 

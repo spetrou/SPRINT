@@ -1,7 +1,7 @@
 /**************************************************************************
  *                                                                        *
  *  SPRINT: Simple Parallel R INTerface                                   *
- *  Copyright © 2008,2009 The University of Edinburgh                     *
+ *  Copyright Â© 2012 The University of Edinburgh                          *
  *                                                                        *
  *  This program is free software: you can redistribute it and/or modify  *
  *  it under the terms of the GNU General Public License as published by  *
@@ -18,22 +18,48 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef _COMMANDS_H
-#define _COMMANDS_H
+#include <Rdefines.h>
+#include <string.h>
+#include "../../../sprint.h"
+#include "../../../functions.h"
 
-/**
- * Lists all the functions available, ensure that TERMINATE is first and
- * LAST is last. If you add a command code you must add a command function
- * in sprint/functions.c
- **/
+extern int hamming(int n,...);
 
-enum commandCodes {TERMINATE = 0, PCOR, PMAXT, PPAM, PAPPLY, PRANDOMFOREST, PBOOT, PHAMMING, PTEST, INIT_RNG, RESET_RNG, PBOOTRP, PBOOTRPMULTI, LAST};
+/* **************************************************************** *
+ *  Accepts information from R gets response and returns it.        *
+ *                                                                  *
+ * **************************************************************** */
+int phamming(char **x,
+             char **out_filename,
+             int *sample_width,
+             int *number_of_samples)
+{
 
-/**
- * Stereotype for interface functions. You almost certainly don't need to
- * mess with this.
- **/
+  int response;
+  int worldSize, worldRank;
+  
+  enum commandCodes commandCode;
+  
+  // Check that MPI is initialized
+  MPI_Initialized(&response);
+  if (response) {
+    DEBUG("\nMPI is init'ed in phamming\n");
+  } else {
+    DEBUG("\nMPI is NOT init'ed in phamming\n");
+    return(-1);
+  }
+  
+  // Get size and rank from communicatorx
+  MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
+  MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
+  
+  // Broadcast command to other processors
+  commandCode = PHAMMING;
+  MPI_Bcast(&commandCode, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  
+  // Call the partitioning around medoids function
+  response = hamming(4, *x, *sample_width, *number_of_samples, *out_filename);
+  
+  return response;
 
-typedef int (*commandFunction)(int n,...);
-
-#endif
+}

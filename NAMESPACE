@@ -15,6 +15,7 @@ export(pRP)
 export(pRPadvance)
 export(pRS)
 export(pRSadvance)
+export(phamming.distance)
 
 ## generics
 S3method(print, pam)

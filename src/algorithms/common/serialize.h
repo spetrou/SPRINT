@@ -1,7 +1,7 @@
 /**************************************************************************
  *                                                                        *
  *  SPRINT: Simple Parallel R INTerface                                   *
- *  Copyright © 2008,2009 The University of Edinburgh                     *
+ *  Copyright Â© 2012 The University of Edinburgh                          *
  *                                                                        *
  *  This program is free software: you can redistribute it and/or modify  *
  *  it under the terms of the GNU General Public License as published by  *
@@ -18,22 +18,18 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef _COMMANDS_H
-#define _COMMANDS_H
+#ifndef _SERIALIZE_H
+#define _SERIALIZE_H
 
-/**
- * Lists all the functions available, ensure that TERMINATE is first and
- * LAST is last. If you add a command code you must add a command function
- * in sprint/functions.c
- **/
-
-enum commandCodes {TERMINATE = 0, PCOR, PMAXT, PPAM, PAPPLY, PRANDOMFOREST, PBOOT, PHAMMING, PTEST, INIT_RNG, RESET_RNG, PBOOTRP, PBOOTRPMULTI, LAST};
-
-/**
- * Stereotype for interface functions. You almost certainly don't need to
- * mess with this.
- **/
-
-typedef int (*commandFunction)(int n,...);
+/* When the serialize.c interface is made available to third party
+ * packages this could be pulled entirely into the C layer.  As it is
+ * we have to go through the interpreter. */
+SEXP serialize_form(SEXP form);
+SEXP unserialize_form(SEXP form);
+SEXP getListElement(SEXP list, char *str);
+void setListElement(SEXP list, char *str, SEXP value);
+void reduce_combine(SEXP in, SEXP *out, SEXP (*combine_fn)(SEXP, SEXP),
+                    int root, MPI_Comm comm);
 
 #endif
+

@@ -1,0 +1,68 @@
+VERSION sprint 1.0.2
+
+    o Fixed the issue with filling the $clusinfo[] and $silinfo$avg.width values in ppam
+    o The "bug in C cstat(): ntt=0 !!!" no longer appear in ppam
+
+VERSION sprint 1.0.1
+
+    o Fixed the issue with worker processes finalization.
+
+VERSION sprint 1.0.0
+
+    o First 'full' release of SPRINT.
+    
+    o Added papply(), a parallel 'apply' function.
+    
+    o Added pboot(), a parallel bootstrapping function.
+    
+    o Added prandomForest(), an ensemble tree classifier.
+    
+    o Added pRP(), a parallel rank product function.
+
+VERSION sprint beta 0.3.0
+
+    o Added ppam(), a parallel clustering function performing a partition
+    around medoid.
+    
+    o Added functionality to pcor(), to allow the correlation between two 
+    matrices.
+
+VERSION sprint beta 0.2.0
+
+    o Simplified installation process and reduced set of requirements.
+    
+    o Added pmaxt(), a parallel permutation test function.
+    
+    o Added functionality to pcor() to allow the output of the distance matrix 
+    instead of the correlation coefficient matrix.
+
+VERSION sprint beta 0.1.0
+
+    o Improved scalability.
+    
+    o Added ability to process data sets larger than the memory of the 
+    computer.
+    
+    o pcor() interface changed to allow the use of ff objects as input.
+    
+    o pcor() now returns a binary file as output instead of a text file. 
+
+VERSION sprint prototype 0.0.3 
+    
+    o Introduction of the SPRINT library of parallel R functions.
+    
+    o Added ptest(), a function that check the library is installed and 
+    operating properly.
+    
+    o Added pcor(), a parallel version of the Pearson correlation. pcor() 
+    takes a 2D array as input and correlates each row with every other row.
+    
+==============================================================================
+SPRINT Team
+
+email: sprint@ed.ac.uk
+http://www.r-sprint.org
+
+Copyright © 2012 The University of Edinburgh.
+==============================================================================
+   

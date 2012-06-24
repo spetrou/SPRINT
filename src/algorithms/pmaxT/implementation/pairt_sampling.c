@@ -1,10 +1,10 @@
 
-#include "assert.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 static int local_n=0;                           /* The number of samples for permutations                            */
 static int local_perm_size=0;                   /* The number of total simultaions                                   */
@@ -71,10 +71,10 @@ void create_sampling_pairt(int n, int *L, int B, int generator_flag, int initial
 
     } else {
 
-        assert(myL = (int *)calloc(n, sizeof(int)));
+        myL = (int *)R_alloc(n, sizeof(int));
         local_random_flag=1;
 
-        assert(l_all_samples = (unsigned int *)calloc(local_perm_size*local_size, sizeof(int)));
+        l_all_samples = (unsigned int *)R_alloc(local_perm_size*local_size, sizeof(int));
 
         // Setting the first sample as the original data
         set_binpermu(L, 0, n,local_size, local_length, local_perm_size, l_all_samples);
@@ -115,7 +115,6 @@ void create_sampling_pairt(int n, int *L, int B, int generator_flag, int initial
             }
             set_binpermu(myL, i, n, local_size, local_length, local_perm_size, l_all_samples);
         }
-        free(myL);
     }
 }
 
@@ -235,7 +234,6 @@ void delete_sampling_pairt(void)
 {
     if(local_random_flag) {
         if(local_perm_size != 0) {
-            free(l_all_samples);
             l_all_samples=NULL;
         }
     }
