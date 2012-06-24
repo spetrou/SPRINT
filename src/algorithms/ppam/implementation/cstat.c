@@ -152,8 +152,7 @@ void cstat(int my_rank, int world_size, int my_start, int my_end, int n_clusters
               radus[k] = djm;
           }
         }
-        
-        if(ntt == 0) REprintf("bug in C cstat(): ntt=0 !!!\n");
+
         avsyl[k] = ttt / (ntt+1);
         med[k] = m;
       }     

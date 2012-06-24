@@ -8,8 +8,8 @@
 #include <time.h>
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
 #include "mt.h"
+#include "../../../sprint.h"
 
 #define mtT 1
 #define mtF 2
@@ -391,29 +391,11 @@ int type2sample(char **options, SAMPLING_DATA *sd)
             sd->fn_next   = next_sample_block;
             break;
         default:
-            fprintf(stderr, "Can not recogize the parameter\n");
+          error("Can not recogize the parameter\n");
             return 0;
     }
 
     return 1;
 }
-
-
-
-/*test*/
-/*main()
-{
-    #define N 6
-    #define NUMB 6
-    int n=N;
-    int L[N]={0,0,1,1,2,2};
-    int B=NUMB;
-    int S[NUMB*N];
-    int i;
-
-    get_sample_labels(&n,L,&B,S);
-    for(i=0; i<B; i++)
-        print_narray(stderr,S+i*n,n);
-}*/
 
 

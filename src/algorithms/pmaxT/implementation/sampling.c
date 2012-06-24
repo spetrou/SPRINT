@@ -1,10 +1,10 @@
 
-#include "assert.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 typedef struct tagPERMU_ARRAY {
     int n;              /* The number of original observations (samples) needs to permute       */
@@ -44,7 +44,7 @@ void create_sampling(int n, int *L, int B, int generator_flag, int initial_count
     local_perm_count = 1;
 
     // Allocate and initialize local L to original L
-    assert(local_L = (int *)malloc(sizeof(int) * n));
+    local_L = (int *)R_alloc(n, sizeof(int));
 
     // To check random or complete
     if( generator_flag == 1 ) {
@@ -89,9 +89,9 @@ void create_sampling(int n, int *L, int B, int generator_flag, int initial_count
         // Intiailize the permu_array (struct)
         init_permu_array(&local_pa, L, n, B);
 
-        assert(permun = (int *)calloc(local_pa.n, sizeof(int)));
-        assert(ordern = (int*)calloc(local_pa.n, sizeof(int)));
-        assert(myL = (int *)calloc(local_pa.n, sizeof(int)));
+        permun = (int *)R_alloc(local_pa.n, sizeof(int));
+        ordern = (int*)R_alloc(local_pa.n, sizeof(int));
+        myL = (int *)R_alloc(local_pa.n, sizeof(int));
 
         // * ================================================================= *
         // *                     Forwarding logic                              *
@@ -133,10 +133,7 @@ void create_sampling(int n, int *L, int B, int generator_flag, int initial_count
             set_permu(&local_pa, i, myL);
         }
 
-        // Free allocated memory
-        free(myL);
-        free(ordern);
-        free(permun);
+
     }
 }
 
@@ -206,7 +203,7 @@ static int init_permu_array(PERMU_ARRAY *pa, int *L, int n, int B)
     (pa->k)++;
 
     // Compute nk (how many rows each class has)
-    assert(pa->nk = (int *)calloc(pa->k, sizeof(int)));
+    pa->nk = (int *)R_alloc(pa->k, sizeof(int));
     memset(pa->nk, 0, sizeof(int)*pa->k);
     for(i=0; i<n; i++)
         pa->nk[L[i]]++;
@@ -218,7 +215,7 @@ static int init_permu_array(PERMU_ARRAY *pa, int *L, int n, int B)
     pa->sz = ceil(n/(pa->len*1.0));
 
     // Allocate the space for v
-    assert(pa->v = (unsigned int*)calloc(B*pa->sz, sizeof(int)));
+    pa->v = (unsigned int*)R_alloc(B*pa->sz, sizeof(int));
 
     return 1;
 }
@@ -298,7 +295,6 @@ void delete_sampling(void)
     delete_permu_array(&local_pa);
 
     if ( local_L != NULL ) {
-        free(local_L);
         local_L = NULL;
     }
 }
@@ -310,12 +306,10 @@ void delete_sampling(void)
 static void delete_permu_array(PERMU_ARRAY *pa)
 {
     if(pa->nk != NULL ) {
-        free(pa->nk);
         pa->nk = NULL;
     }
 
     if(pa->B != 0) {
-        free(pa->v);
         pa->v = NULL;
     }
 }

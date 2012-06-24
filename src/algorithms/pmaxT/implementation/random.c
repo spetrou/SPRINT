@@ -138,27 +138,4 @@ void sample(int *V, int n)
 }
   
 
-/*void main(int argc, char* argv[])
-{
-  int n;
-  long seed=100;
-  int i;
-  double temp;
- #define DIM 20
-  int V[DIM];
-  n=atoi(argv[1]);
-  seed=atol(argv[2]);
-  set_seed(seed);
-  for(i=0;i<n;i++){
-    temp=get_rand();
-    fprintf(stderr,"%f ",temp);
-  }
-  fprintf(stderr,"\n");
-  fprintf(stderr,"The sampling of %d\n",DIM);
-  for(i=0;i<DIM;i++)
-    V[i]=i+1;
-  sample(V,DIM,DIM);
-  for(i=0;i<DIM;i++)
-  fprintf(stderr,"%d ",V[i]);
-}*/
 

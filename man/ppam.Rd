@@ -23,9 +23,23 @@ ppam(x, k, medoids = NULL, is_dist = inherits(x, "dist"),
     \item{trace.lev}{positive integer for the level of details returned for
                      diagnostics}
 }
+\details{
+The interface and parameters to parallel function ppam() are similar to the 
+serial function pam() but not identical. ppam() requires a distance matrix as
+input parameters. Although, ppam() does not include the option to calculate 
+the distance matrix, this can easily be done using SPRINT pcor() function with
+the 'distance' parameter set to TRUE. 
+}
 \seealso{
     \code{\link[cluster]{pam}}
-    \code{\link{sprint}}
+    \code{\link[ff]{ff}}
+    \code{\link{pcor}}
+    \code{\link{SPRINT}}
 }
+\author{
+University of Edinburgh SPRINT Team
+    \email{sprint@ed.ac.uk}
+    \url{www.r-sprint.org}
+    }
 \keyword{utilities}
 \keyword{interface}

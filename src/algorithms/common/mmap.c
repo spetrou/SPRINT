@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "mmap.h"
+#include "../../sprint.h"
 
 double* map_file(char* filename, int* filesize) {
 
@@ -36,17 +37,17 @@ double* map_file(char* filename, int* filesize) {
   
   fd = open (filename, O_RDONLY);
   if (fd == -1) {
-    perror ("open");
+    error ("open");
     return NULL;
   }
   
   if (fstat (fd, &sb) == -1) {
-    perror("fstat");
+    error("fstat");
     return NULL;
   }
 
   if (!S_ISREG (sb.st_mode)) {
-    fprintf (stderr, "%s is not a file \n", filename);
+    error ("%s is not a file \n", filename);
     return NULL;
   }
 
@@ -54,12 +55,12 @@ double* map_file(char* filename, int* filesize) {
   *filesize = sb.st_size;
 
   if (p == MAP_FAILED) {
-    perror("mmap");
+    error("mmap");
     return NULL;
   }
 
   if(close(fd) == -1) {
-    perror("close");
+    error("close");
     return NULL;
   }
   
@@ -73,22 +74,22 @@ void unmap_file (double* p, char* filename) {
 
   fd = open (filename, O_RDONLY);
   if (fd == -1) {
-    perror ("open");
+    error ("open");
     return;
   }
 
   if (fstat (fd, &sb) == -1) {
-    perror("fstat");
+    error("fstat");
     return;
   }
                    
   if (munmap (p, sb.st_size) == -1) {
-    perror ("munmap");
+    error ("munmap");
     return;
   }
 
   if(close(fd) == -1) {
-    perror("close");
+    error("close");
     return;
   }
 

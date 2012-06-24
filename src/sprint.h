@@ -49,8 +49,8 @@
         { \
           struct timeval tick; \
           gettimeofday(&tick, NULL); \
-          fprintf(stderr, "%i.%i - ", (int)tick.tv_sec, (int)tick.tv_usec); \
-          fprintf(stderr, __VA_ARGS__); fflush(stderr); \
+          error( "%i.%i - ", (int)tick.tv_sec, (int)tick.tv_usec);  \
+          error( __VA_ARGS__); \
         }
 
 /* A handy little macro to force debug logging */

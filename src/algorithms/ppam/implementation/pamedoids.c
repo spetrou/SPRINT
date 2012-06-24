@@ -198,28 +198,28 @@ int pamedoids(int n,...) {
         all_stats, radus, damer, avsyl, separ, &max_distance, distance_matrix,
         ncluv, nelem, med, nisol);
   
-//  if(all_stats) {
+  if(all_stats) {
     
-//    if(worldRank == MASTER_PROCESS) {
-//      for (int k = 0; k < n_clusters; k++) {
+    if(worldRank == MASTER_PROCESS) {
+      for (int k = 0; k < n_clusters; k++) {
         
-//        clusinf[k]=		(double)       nrepr[k];
-//        clusinf[k + clusinf_dim1]	     = radus[k];
-//        clusinf[k + (clusinf_dim1 << 1)] = avsyl[k];
-//        clusinf[k + clusinf_dim1 * 3]    = damer[k];
-//        clusinf[k + (clusinf_dim1 << 2)] = separ[k];
-//      }
-  //   }
+        clusinf[k]=		(double)       nrepr[k];
+        clusinf[k + clusinf_dim1]	     = radus[k];
+        clusinf[k + (clusinf_dim1 << 1)] = avsyl[k];
+        clusinf[k + clusinf_dim1 * 3]    = damer[k];
+        clusinf[k + (clusinf_dim1 << 2)] = separ[k];
+      }
+    }
 
-//    if (1 < n_clusters && n_clusters < n_rows) {
+    if (1 < n_clusters && n_clusters < n_rows) {
     
 	    /* Compute Silhouette info : */
-//      silhouette(worldRank, worldSize, my_start, my_end,
-//                 n_clusters, n_rows, ncluv, nsend, nelem, nrepr,
-//                 radus, damer, avsyl, ttsyl, distance_matrix,
-//                 &max_distance, sylinf);
-//    }
-//  }
+      silhouette(worldRank, worldSize, my_start, my_end,
+                 n_clusters, n_rows, ncluv, nsend, nelem, nrepr,
+                 radus, damer, avsyl, ttsyl, distance_matrix,
+                 &max_distance, sylinf);
+    }
+  }
      
   if(trace_lev) Rprintf("end{cstat()}\n");
   

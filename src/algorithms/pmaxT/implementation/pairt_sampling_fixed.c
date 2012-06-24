@@ -1,9 +1,9 @@
 
-#include "assert.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 static int local_n=0;               /* The number of samples for permutations   */
 static int local_perm_size=0;       /* The number of total simultaions          */
@@ -22,7 +22,7 @@ void create_sampling_pairt_fixed(int n, int *L, int B, int generator_flag, int i
     local_perm_size = B;
     local_perm_count = 1;
 
-    assert(local_L = (int*)malloc(sizeof(int)*n));
+    local_L = (int*)R_alloc(n,sizeof(int));
 
     // * ================================================================= *
     // *                     Forwarding logic                              *
@@ -100,7 +100,6 @@ int next_sample_pairt_fixed(int *L)
 void delete_sampling_pairt_fixed(void)
 {
     if ( local_L != NULL ) {
-        free(local_L);
         local_L=NULL;
     }
 }

@@ -18,13 +18,18 @@ pmaxT(X, classlabel, test = "t", side = "abs", fixed.seed.sampling = "y",
     \item{side}{Type of rejection region, either abs, upper or lower}
     \item{fixed.seed.sampling}{whether the permutations are calculated on the 
                                fly or save to memory}
-    \item{B}{Number or permutations}
+    \item{B}{number or permutations}
     \item{na}{missing value tag}
     \item{nonpara}{whether non-parametric test statistics or not}
 }
 \seealso{
     \code{\link[multtest]{mt.maxT}}
-    \code{\link{sprint}}
+    \code{\link{SPRINT}}
 }
+\author{
+University of Edinburgh SPRINT Team
+    \email{sprint@ed.ac.uk}
+    \url{www.r-sprint.org}
+    }
 \keyword{utilities}
 \keyword{interface}

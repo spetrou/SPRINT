@@ -3,8 +3,8 @@
 #include "stdlib.h"
 #include "stdarg.h"
 #include "math.h"
-#include "assert.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 static double* gp_arr;   
 
@@ -52,7 +52,7 @@ void order_mult_data(int* R,int n,int k,...)
     int i;
 
     // Allocate, initialize and check memory allocation
-    assert(cmp_data = (CMP_DATA*)calloc(k, sizeof(CMP_DATA)));
+    cmp_data = (CMP_DATA*)R_alloc(k, sizeof(CMP_DATA));
 
     // Get input arguments
     va_start(ap,k);
@@ -69,10 +69,8 @@ void order_mult_data(int* R,int n,int k,...)
         R[i] = i;
     qsort(R, n, sizeof(R[0]), cmp_mult);
 
-    // Free allocated data
-    free(cmp_data);
 }
-
+    
 void order_data(double* V,int*R,int n,FUNC_CMP func_cmp)
 {
     int i;

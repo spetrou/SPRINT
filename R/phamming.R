@@ -1,8 +1,6 @@
 ##########################################################################
 #                                                                        #
 #  SPRINT: Simple Parallel R INTerface                                   #
-#  Copyright © 2008,2009 The University of Edinburgh                     #
-#                                                                        #
 #  This program is free software: you can redistribute it and/or modify  #
 #  it under the terms of the GNU General Public License as published by  #
 #  the Free Software Foundation, either version 3 of the License, or     #
@@ -18,26 +16,42 @@
 #                                                                        #
 ##########################################################################
 
+## consistent error / warning messages;
+..msg <- list(error =
+              c(non.dna = "Function only accepts ShortReadQ or DNAStringSet objects",
+                empty = "Data object is empty",
+                no_file = "Output filename is missing"
+                ), warn = c()
+              )
 
-# These functions are called automatically by the R extensions
-# system. They perform some R-side initialisation, then call
-# down to the library initialisation.
+phamming.distance <- function (data, output_filename) {
 
-## Called after the library has finished loading, and all NAMESPACE
-## exports have been processed
-.onAttach <- function(lib, pkg) {
-  ## We start the worker after attaching the library so that
-  ## lazy-loaded R code in SPRINT is available to the slave processes
-  invisible(.C("worker"))
-  ver <- read.dcf(file.path(lib, pkg, "DESCRIPTION"), "Version")
-  ver <- as.character(ver)
-  packageStartupMessage("SPRINT ", ver, " loaded\n")
+  objectType <- class(data)
+  if(!length(data)) stop(..msg$error["empty"])
+
+  if (is.null(output_filename)) stop(..msg$error["empty"])
+  
+  if (objectType=='ShortReadQ') {  
+    data <- sread(data)
+  } else if (objectType!='DNAStringSet') {
+    stop(..msg$error["non.dna"])
+  }
+
+  sample_width <- width(data[1])
+  number_of_samples <- length(data)
+
+  if(sample_width<1 || number_of_samples<2) stop(..msg$error["empty"])
+
+  return_val <- .C("phamming",
+                   as.character(IRanges::unlist(data)),
+                   as.character(output_filename),
+                   as.integer(sample_width),
+                   as.integer(number_of_samples)                   
+                   )
+
+  # Return values from the interface have meaning.
+  #  0    -->     success
+  # -1    -->     MPI is not initialized
+  
+  return(return_val)
 }
-
-## Called when the extension is unloaded. This is expected to happen
-## when the script terminates and R shuts down.
-.Last.lib <- function(libpath) {
-  .Call("sprint_shutdown")
-  library.dynam.unload("sprint", libpath)
-}
-

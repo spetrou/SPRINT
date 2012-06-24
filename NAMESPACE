@@ -15,6 +15,7 @@ export(pRP)
 export(pRPadvance)
 export(pRS)
 export(pRSadvance)
+export(phamming.distance)
 export(sprint.setOpenMPThreads)
 export(sprint.MPI_WORLD_SIZE)
 

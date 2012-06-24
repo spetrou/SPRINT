@@ -1,9 +1,9 @@
 \name{ptest}
 \alias{ptest}
-\title{Parallel "Hello World"}
+\title{SPRINT Installation Test}
 \description{
-Simple "Hello World" function to test the correct installation of the SPRINT
-package on multiple processors.
+Function that test the correct installation of the SPRINT library. It simply 
+prints a message identifying each processor in the compute cluster.
 }
 \usage{
 ptest()
@@ -12,7 +12,12 @@ ptest()
 None
 }
 \seealso{
-\code{\link{sprint}}
+\code{\link{SPRINT}}
 }
+\author{
+University of Edinburgh SPRINT Team
+    \email{sprint@ed.ac.uk}
+    \url{www.r-sprint.org}
+    }
 \keyword{utilities}
 \keyword{interface}

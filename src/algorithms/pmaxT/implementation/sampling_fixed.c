@@ -1,10 +1,10 @@
 
-#include "assert.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "math.h"
 #include "string.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 static int local_n=0;           /* The length of L                      */
 static int local_k=0;           /* The number of groups                 */
@@ -28,7 +28,7 @@ void create_sampling_fixed(int n, int *L, int B, int generator_flag, int initial
     local_b = 1;
 
     // Allocate memory and copy class labels there
-    assert(local_L = (int *)calloc(n, sizeof(int)));
+    local_L = (int *)R_alloc(n, sizeof(int));
     memcpy(local_L, L, sizeof(int)*n);
 
     // Count how many classes the set has
@@ -40,14 +40,14 @@ void create_sampling_fixed(int n, int *L, int B, int generator_flag, int initial
     // Set the value of local_k to the class count
     local_k=k;
 
-    assert(local_nk = (int *)calloc(k, sizeof(int)));
+    local_nk = (int *)R_alloc(k, sizeof(int));
     memset(local_nk, 0, sizeof(int)*k);
 
     for(i=0; i<n; i++)
         local_nk[L[i]]++;
 
-    assert(local_permun = (int *)calloc(n, sizeof(int)));
-    assert(local_ordern = (int *)calloc(n, sizeof(int)));
+    local_permun = (int *)R_alloc(n, sizeof(int));
+    local_ordern = (int *)R_alloc(n, sizeof(int));
 
     // * ================================================================= *
     // *                     Forwarding logic                              *
@@ -123,11 +123,7 @@ int next_sample_fixed(int *L)
  * ************************************************ */
 void delete_sampling_fixed(void)
 {
-    // Free allocated memory
-    free(local_L);
-    free(local_nk);
-    free(local_permun);
-    free(local_ordern);
+
 
     // Set pointers to NULL
     local_L=NULL;

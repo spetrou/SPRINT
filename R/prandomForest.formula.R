@@ -23,7 +23,7 @@
   function(formula, data = NULL, ..., subset, na.action = na.fail) {
     if (!inherits(formula, "formula"))
       stop("method is only for formula objects")
-    m <- match.call(expand = FALSE)
+    m <- match.call(expand.dots = FALSE)
     if (any(c("xtest", "ytest") %in% names(m)))
       stop("xtest/ytest not supported through the formula interface")
     names(m)[2] <- "formula"

@@ -2,9 +2,9 @@
 #include "stdlib.h"
 #include "stdarg.h"
 #include "math.h"
-#include "assert.h"
 #include "string.h"
 #include "mt.h"
+#include "../../../sprint.h"
 
 /*This file is used to collect some useful statistics functions*/
 
@@ -300,9 +300,9 @@ double Fstat_num_denum(const double *Y, const int *L, const int n, const double 
     int i, cur_class, k, *ni, N=0;  // ni the number of objects group i, 
                                     // k is the number of groups, N is the total number of validate objects
     k = *(int*)extra;
-    assert(meani = (double *)calloc(k, sizeof(double)));
-    assert(ssi = (double *)calloc(k, sizeof(double)));
-    assert(ni = (int *)calloc(k, sizeof(int)));
+    meani = (double *)R_alloc(k, sizeof(double));
+    ssi = (double *)R_alloc(k, sizeof(double));
+    ni = (int *)R_alloc(k, sizeof(int));
 
     // Initialize to zero
     for(i=0; i<k; i++){
@@ -347,9 +347,6 @@ double Fstat_num_denum(const double *Y, const int *L, const int n, const double 
     *num = bss/(k-1.0);
     *denum = wss/(N-k-0.0);
 
-    free(meani);
-    free(ni);
-    free(ssi);
 
     return 1;
 } 
@@ -385,12 +382,12 @@ double Block_Fstat_num_denum(const double *Y, const int *L, const int n, const d
     B = n/m;
 
     if(B*m != n){
-        fprintf(stderr,"The design is not balanced as B(%d)xm(%d)!=n(%d)\n",B,m,n);
+      error("The design is not balanced as B(%d)xm(%d)!=n(%d)\n",B,m,n);
         return NA_FLOAT;
     }
 
-    assert(meani = (double *)calloc(B, sizeof(double)));
-    assert(meanj = (double *)calloc(m, sizeof(double)));
+    meani = (double *)R_alloc(B, sizeof(double));
+    meanj = (double *)R_alloc(m, sizeof(double));
 
     for(i=0; i<B; i++) {
         meani[i]=0;
@@ -440,8 +437,7 @@ double Block_Fstat_num_denum(const double *Y, const int *L, const int n, const d
     *num = bss/(m-1.0);
     *denum = wss/((m-1.0)*(B-1.0));
 
-    free(meani);
-    free(meanj);
+
 
     return 1;
 } 
@@ -554,7 +550,7 @@ int next_lex(int *A, int n, int k)
     if(l<0) {
         if (myDEBUG)
         {
-            fprintf(stderr,"%s%s","We've achieved the maximum permutation already\n",
+          error("%s%s","We've achieved the maximum permutation already\n",
                     "We can not find the next one in next_lex\n");
         }
         // Note we can not generate the next permutations
@@ -594,7 +590,7 @@ int next_label(int n, int k, int *nk, int *L)
 {
     int *permun, ret;
 
-    assert(permun = (int*)calloc(n, sizeof(int)));
+    permun = (int*)R_alloc(n, sizeof(int));
 
     label2sample(n, k, nk, L, permun);
 
@@ -602,7 +598,6 @@ int next_label(int n, int k, int *nk, int *L)
 
     sample2label(n, k, nk, permun, L);
 
-    free(permun);
 
     return ret;
 }
@@ -630,7 +625,7 @@ void label2sample(int n, int k, int *nk, int *L, int *permun)
     int *s;
 
     // Initialize the beginning
-    assert(s = (int*)calloc(k, sizeof(int)));
+    s = (int*)R_alloc(k, sizeof(int));
 
     s[0]=0;
     for(l=1; l<k; l++){
@@ -643,7 +638,6 @@ void label2sample(int n, int k, int *nk, int *L, int *permun)
         s[l]++;
     }
 
-    free(s);
 }
 
 
@@ -685,7 +679,7 @@ int next_two_permu(int *V, int n, int k)
     int* A=V;
     int* B=V+k;
     int* tempV, *cpyV;
-    assert(tempV = (int*)calloc(n, sizeof(int)));
+    tempV = (int*)R_alloc(n, sizeof(int));
 
     i=k-1;
     while(i>=0 && A[i]>maxb){
@@ -703,7 +697,7 @@ int next_two_permu(int *V, int n, int k)
         memcpy(V,tempV,sizeof(int)*n);
 
         // Coppying back to V
-        free(tempV);
+
 
         return 0;
     }
@@ -728,7 +722,7 @@ int next_two_permu(int *V, int n, int k)
     // Copy the ((n-k)-(j+1)) elements from array 
     // B[j+1],...B[n-k-1],..,A[i+1],..A[k-1]
     // Construct the array B[j+1],...B[n-k-1],A[i+1],..A[k-1]
-    assert(cpyV = (int*)calloc(n, sizeof(int)));
+    cpyV = (int*)R_alloc(n, sizeof(int));
     memcpy(cpyV, B+j+1, sizeof(int)*((n-k)-(j+1)));
 
     if(k > (i+1))
@@ -743,8 +737,7 @@ int next_two_permu(int *V, int n, int k)
     /*copy back to V*/
     memcpy(V, tempV, sizeof(int)*n);
 
-    free(cpyV);
-    free(tempV);
+
 
     return 1;
 }
@@ -849,7 +842,7 @@ int next_permu(int *V, int n)
 
     if(i<0) {
         if (myDEBUG) {
-            fprintf(stderr,"%s%s", "We've achieved the maximum permutation already\n",
+          error("%s%s", "We've achieved the maximum permutation already\n",
                     "We can not find the next one-in next_permu\n");
         }
         return 0;/*note we can not generate the next permutations*/
@@ -864,7 +857,7 @@ int next_permu(int *V, int n)
         j--;
     }
 
-    assert(cpyV = (int*)calloc(n, sizeof(int)));
+    cpyV = (int*)R_alloc(n, sizeof(int));
     memcpy(cpyV, V, sizeof(int)*n);
 
     V[i]=cpyV[j];
@@ -873,7 +866,6 @@ int next_permu(int *V, int n)
         V[l]=cpyV[n+i-l];
     }
 
-    free(cpyV);
 
     return 1;
 }
@@ -931,22 +923,22 @@ void read_infile(char *filename, GENE_DATA *pdata) {
     int i, j;
     double ftemp;
 
-    assert(fh=fopen(filename, "r"));
+    fh=fopen(filename, "r");
 
     /*read the labelling first*/
-    assert(fscanf(fh, "%s", pdata->name));
+    fscanf(fh, "%s", pdata->name);
 
     for (j=0; j<pdata->ncol; j++) 
-        assert(fscanf(fh, "%d", pdata->L+j));
+        fscanf(fh, "%d", pdata->L+j);
 
     /*read the mxn matrix of the gene values data*/
     for (i=0; i<pdata->nrow; i++) {
         /*read gene id and the first gene values*/
-        assert(fscanf(fh, "%s", pdata->id[i]));
+        fscanf(fh, "%s", pdata->id[i]);
         /*read the rest of it*/
         for (j=0; j<pdata->ncol; j++) {
             /*deal with the double data*/
-            assert(fscanf(fh, "%lg", &ftemp));
+            fscanf(fh, "%lg", &ftemp);
             pdata->d[i][j]=ftemp;
         }
     }
@@ -963,10 +955,10 @@ void print_gene_data(GENE_DATA *pdata)
     int i, j;
 
     for (i=0; i<pdata->nrow; i++){
-        fprintf(stderr,"%20s", pdata->id[i]);
+      error("%20s", pdata->id[i]);
         for (j=0; j<pdata->ncol; j++) 
-            fprintf(stderr," %5.3f", pdata->d[i][j]);
-        fprintf(stderr,"\n");
+          error(" %5.3f", pdata->d[i][j]);
+        error("\n");
     }
 }
 
@@ -992,17 +984,7 @@ void write_outfile(FILE *fh, GENE_DATA *pdata, double *T, double *P, double *Adj
     // The length of the array T,P,etc.
     nrow=pdata->nrow;
 
-    if(myDEBUG)
-    {
-        fprintf(stderr, "\nThe results of T,P Adj_P and Adj_Lower");
-        print_farray(stderr, T, nrow);      
-        print_farray(stderr, P, nrow);
-        print_farray(stderr, Adj_P, nrow);
-        if(Adj_Lower)
-            print_farray(stderr, Adj_Lower, nrow);
-    }
-
-    fprintf(stderr, "\nWe're writing the output\n");
+    // error( "\nWe're writing the output\n");
     fprintf(fh, "%20s %10s %10s %10s", "gene_id", "test-stat", "unadj-p", "adjusted-p");
 
     if(Adj_Lower)
