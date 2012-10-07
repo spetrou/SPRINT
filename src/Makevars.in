@@ -6,5 +6,6 @@
 # *  that are related and needed by MPI.                                   *
 # * ********************************************************************** *
 MPICC    = @MPICC@
+MPICXX   = @MPICXX@
 MPILIBS  = @MPILIBS@
 

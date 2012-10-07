@@ -124,7 +124,7 @@ dnl * ********************************************** *
 
 AC_SUBST(MPILIBS)
 AC_SUBST(MPICC)
-
+AC_SUBST(MPICXX)
 
 dnl * *********************** *
 dnl *  Create Makevarsn file  *

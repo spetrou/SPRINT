@@ -33,6 +33,7 @@
  */
 
 extern int test(int n,...);
+extern int svm_call(int n,...);
 extern int correlation(int n,...);
 extern int permutation(int n,...);
 extern int pamedoids(int n,...);
@@ -62,6 +63,7 @@ int voidCommand(int n,...)
  **/
 
 commandFunction commandLUT[] = {voidCommand,
+				svm_call,
                                 correlation,
                                 permutation,
                                 pamedoids,

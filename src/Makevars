@@ -6,5 +6,6 @@
 # *  that are related and needed by MPI.                                   *
 # * ********************************************************************** *
 MPICC    = mpicc -std=gnu99 
+MPICXX   = mpicxx
 MPILIBS  =  
 

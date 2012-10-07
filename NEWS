@@ -2,6 +2,7 @@ VERSION sprint 1.0.2
 
     o Fixed the issue with filling the $clusinfo[] and $silinfo$avg.width values in ppam
     o The "bug in C cstat(): ntt=0 !!!" no longer appear in ppam
+    o psvm(), a svm function
 
 VERSION sprint 1.0.1
 
