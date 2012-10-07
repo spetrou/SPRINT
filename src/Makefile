@@ -37,9 +37,13 @@ CFLAGS = -pedantic -O3 -fPIC
 .PHONY: all
 all: sprint.so
 
-# * **************************************** *
-# *  This is the library which links with R  *
-# * **************************************** *
+# * *********************************************************** *
+# *  This is the library which links with R                     *
+# *                                                             *
+# *  TODO:  Think about the code below. Do we really need       *
+# *         the 'else' branch? We can probably set CC to MPICC  *
+# *         and skip the string comparison logic.               *
+# * *********************************************************** *
 
 sprint.so: $(INTERFACE_OBJS) $(SHARED_ALGORITHM_OBJS) $(SHLIB_OBJS) $(IMPLEMENTATION_OBJS)
 ifeq (mpicc,$(findstring mpicc,$(MPICC)))
@@ -48,14 +52,16 @@ else
 	$(CC) -shared -o $@ $^ $(MPILIBS)
 endif
 
-.cpp.o:
+# * *********************************************************** *
+# *  Create object files for each main target                   *
+# * *********************************************************** *
+
+%.o: %.cpp $(MAKEFILE)
 	$(MPICXX) $(LOCAL_CFLAGS) -I$(R_INCLUDE_DIR) -c -o $@ $< 
 
-.c.o:
+%.o: %.c $(MAKEFILE)
 	$(MPICC) $(LOCAL_CFLAGS) -I$(R_INCLUDE_DIR) -c -o $@ $< 
-# * ****************************************** *
-# *  Create object files for each main target  *
-# * ****************************************** *
+
 # * ****************************** *
 # *  Clean up the build directory  *
 # * ****************************** *
@@ -64,5 +70,4 @@ endif
 clean:
 	find . -name "*.o" -exec rm -f {} \;
 	rm -f sprint.so
-
 

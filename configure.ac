@@ -15,6 +15,8 @@ dnl * *************************************************** *
 
 AC_EGREP_HEADER()
 
+AC_MSG_CHECKING([for C MPI support])
+
 ACX_MPI([AC_MSG_RESULT([MPI found with success])],
         [AC_MSG_FAILURE("Unable to detect MPI compiler. Please use --with-wrapper-script option")])
 
@@ -39,7 +41,7 @@ AC_ARG_WITH(wrapper-script,
 
 CC=$MPICC
 
-AC_MSG_CHECKING([for MPI-2 support])
+AC_MSG_CHECKING([for C MPI-2 support])
 
 AC_RUN_IFELSE(
             [AC_LANG_PROGRAM(
@@ -54,12 +56,41 @@ else exit(1);
 ]])],
             [AC_MSG_RESULT(yes)],
             [AC_MSG_RESULT(no)
-             AC_MSG_FAILURE([The SPRINT package requires full MPI-2 support. Try a more up to date MPI implementation (MPICH2 or openMPI).])])
+             AC_MSG_FAILURE([The SPRINT package requires full C MPI-2 support. Try a more up to date MPI implementation (MPICH2 or openMPI).])])
+
+dnl * ********************************************************* *
+dnl *  Set the language to C++ and search for the MPI compiler  *
+dnl * ********************************************************* *
+
+AC_LANG_PUSH(C++)
+AC_MSG_CHECKING([for C++ MPI support])
+ACX_MPI([AC_MSG_RESULT([MPI found with success])],
+        [AC_MSG_FAILURE("Unable to detect MPI compiler. Please use --with-wrapper-script option")])
+CXX=$MPICXX
+AC_MSG_CHECKING([for C++ MPI-2 support])
+
+AC_RUN_IFELSE(
+            [AC_LANG_PROGRAM(
+[[
+#include <mpi.h>
+#include <stdlib.h>
+]],
+[[
+
+if (MPI_VERSION == 2) exit(0);
+else exit(1);
+
+]])],
+            [AC_MSG_RESULT(yes)],
+            [AC_MSG_RESULT(no)
+             AC_MSG_FAILURE([The SPRINT package requires full C++ MPI-2 support. Try a more up to date MPI implementation (MPICH2 or openMPI).])])
+
+AC_LANG_POP()
 
 dnl * *************************************************** *
-dnl * Check for grep -E and egrep, in that order,	  *
-dnl * and set output variable EGREP to the first one	  *
-dnl * that is found.					  *
+dnl * Check for grep -E and egrep, in that order,         *
+dnl * and set output variable EGREP to the first one      *
+dnl * that is found.                                      *
 dnl * *************************************************** *
 
 dnl AC_PROG_EGREP()
