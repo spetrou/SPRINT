@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <mpi.h>
+#include <omp.h>
 #include <string.h>
 
 #include <R.h>
