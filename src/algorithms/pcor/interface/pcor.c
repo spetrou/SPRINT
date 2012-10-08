@@ -106,10 +106,13 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
 
     // Call the correlation function
     if ( isNull(data_y) ) {
-      response = correlation(5, NUMERIC_POINTER(AS_NUMERIC(data_x)), width, height, file_out, _distance);
+        response = correlation(5, NUMERIC_POINTER(AS_NUMERIC(data_x)),
+                               width, height, file_out, _distance);
     }  else {
-      response = correlation(6, NUMERIC_POINTER(AS_NUMERIC(data_x)), NUMERIC_POINTER(AS_NUMERIC(data_y)),
-                             width, height, file_out, 0);
+        // TODO: Distance flag always zero??? (investigate...)
+        response = correlation(6, NUMERIC_POINTER(AS_NUMERIC(data_x)),
+                               NUMERIC_POINTER(AS_NUMERIC(data_y)),
+                               width, height, file_out, 0);
     }
 
     INTEGER(result)[0] = response;

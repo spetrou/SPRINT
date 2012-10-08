@@ -56,10 +56,14 @@ void free_all(double *cor,
  *  It will transform the input array to more meaningful values  *
  *  and also create vectors for the mean values and variances    *
  * ************************************************************* */
-void compute_parameters(double *dataMatrixX, double *dataMatrixY, int rows, int columns) {
+void compute_parameters(double *dataMatrixX,
+                        double *dataMatrixY,
+                        int rows,
+                        int columns)
+{
 
     int i, j;
-    
+
       // Compute the X mean values of each row
       for(i=0; i < rows; i++) {
         mean_value_vectorX[i] = 0.0;
@@ -68,7 +72,7 @@ void compute_parameters(double *dataMatrixX, double *dataMatrixY, int rows, int 
         }
         mean_value_vectorX[i] /= columns;
       }
-      
+
       // Transform the data_X array
       for(i=0; i < rows; i++) {
         Sxx_vector[i] = 0.0;
@@ -78,7 +82,7 @@ void compute_parameters(double *dataMatrixX, double *dataMatrixY, int rows, int 
         }
         Sxx_vector[i] /= (columns-1);
       }
-      
+
     if (dataMatrixY != NULL) {
       // Compute the Y mean values of each row
       for(i=0; i < rows; i++) {
@@ -88,7 +92,7 @@ void compute_parameters(double *dataMatrixX, double *dataMatrixY, int rows, int 
         }
         mean_value_vectorY[i] /= columns;
       }
-      
+
       // Transform the data_Y array
       for(i=0; i < rows; i++) {
         Syy_vector[i] = 0.0;
@@ -104,8 +108,11 @@ void compute_parameters(double *dataMatrixX, double *dataMatrixY, int rows, int 
 /* ****************************** *
  *  Pearson correlation function  *
  * ****************************** */
-double pearson(double *data, int row_x, int row_y, int size) {
-
+double pearson(double *data,
+               int row_x,
+               int row_y,
+               int size)
+{
     int i;
     double sxy = 0.0;
     double r;
@@ -131,8 +138,12 @@ double pearson(double *data, int row_x, int row_y, int size) {
 /* **************************************************** *
  *  Pearson correlation function for two input matrices *
  * **************************************************** */
-double pearson_XY(double *dataMatrixX, double *dataMatrixY, int row_x, int row_y, int size) {
-
+double pearson_XY(double *dataMatrixX,
+                  double *dataMatrixY,
+                  int row_x,
+                  int row_y,
+                  int size)
+{
     int i;
     double sxy = 0.0;
     double r;
@@ -172,7 +183,7 @@ int correlationKernel(int rank,
     int err, count = 0;
     unsigned int fair_chunk = 0, coeff_count = 0;
     unsigned int cor_cur_size = 0, init_and_cleanup_loop_iter=0;
-    
+
     double start_time, end_time;
 
     // Variables needed by the Indexed Datatype
@@ -197,7 +208,8 @@ int correlationKernel(int rank,
         // Start timer
         start_time = MPI_Wtime();
 
-        // Send out initial tasks (remember you have size-1 workers, master does not count)
+        // Send out initial tasks (remember you have size-1 workers,
+        // master does not count)
         for (i=1; i<init_and_cleanup_loop_iter; i++) {
             taskNo = i-1;
             err = MPI_Send(&taskNo, 1, MPI_INT, i, 0, comm);
@@ -206,7 +218,8 @@ int correlationKernel(int rank,
         // Terminate any processes that were not working due to the fact
         // that the number of rows where less than the actual available workers
         for(i=init_and_cleanup_loop_iter; i < size; i++) {
-            PROF(rank, "\nPROF_idle : Worker %d terminated due to insufficient work load", i);
+            PROF(rank, "\nPROF_idle : Worker %d terminated due to "
+                       "insufficient work load", i);
             err = -1;
             err = MPI_Send(&err, 1, MPI_INT, i, 0, comm);
         }
@@ -215,8 +228,8 @@ int correlationKernel(int rank,
         for (i=init_and_cleanup_loop_iter-1; i<rows; i++) {
             err = MPI_Recv(&taskNo, 1, MPI_INT, MPI_ANY_SOURCE, 0, comm, &stat);
 
-            // Check taskNo to make sure everything is ok. Negative means there is problem
-            // thus terminate gracefully all remaining working workers
+            // Check taskNo to make sure everything is ok. Negative means
+            // there is problem thus terminate gracefully all remaining working workers
             if ( taskNo < 0 ) {
                 // Reduce by one because one worker is already terminated
                 init_and_cleanup_loop_iter--;
@@ -250,17 +263,19 @@ int correlationKernel(int rank,
         if ( global_check != 0 ) {
             return -1;
         }
-        
+
         // Stop timer
         end_time = MPI_Wtime();
-        PROF(rank, "\nPROF_comp (workers=%d) : Time taken by correlation coefficients computations : %g\n", size-1, end_time - start_time);
+        PROF(rank, "\nPROF_comp (workers=%d) : Time taken by correlation "
+                   "coefficients computations : %g\n", size-1, end_time - start_time);
 
         // Start timer
         start_time = MPI_Wtime();
 
         // Master process must call MPI_File_set_view as well, it's a collective call
         // Open the file handler
-        MPI_File_open(comm, out_filename, MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+        MPI_File_open(comm, out_filename, MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                      MPI_INFO_NULL, &fh);
 
         // Create the file view
         MPI_File_set_view(fh, 0, MPI_DOUBLE, MPI_DOUBLE, "native", MPI_INFO_NULL);
@@ -270,7 +285,8 @@ int correlationKernel(int rank,
 
         // Stop timer
         end_time = MPI_Wtime();
-        PROF(rank, "\nPROF_write (workers=%d) : Time taken for global write-file : %g\n",  size-1, end_time - start_time);
+        PROF(rank, "\nPROF_write (workers=%d) : Time taken for global write-file : "
+                   "%g\n",  size-1, end_time - start_time);
 
         // Close file handler
         MPI_File_close(&fh);
@@ -333,7 +349,8 @@ int correlationKernel(int rank,
 
             // This worker failed
             local_check = 1;
-            MPI_Allreduce(&local_check, &global_check, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(&local_check, &global_check, 1, MPI_INT,
+                          MPI_SUM, MPI_COMM_WORLD);
 
             return -1;
         }
@@ -353,11 +370,14 @@ int correlationKernel(int rank,
             // If received task is -1, function is terminated
             if ( taskNo == -1 )  break;
 
-            // Check if there is enough memory to store the new coefficients, if not reallocate
-            // the current memory and expand it by MEM_PERC of the approximated size
+            // Check if there is enough memory to store the new coefficients,
+            // if not reallocate the current memory and expand it by MEM_PERC
+            // of the approximated size
             if ( cor_cur_size < (coeff_count + rows) ) {
-                PROF(0, "\n**WARNING** : Worker process %3d run out of memory and reallocates. Potential work imbalancing\n", rank);
-                DEBUG("\n**WARNING** : Worker process %3d run out of memory and reallocates. Potential work imbalancing\n", rank);
+                PROF(0, "\n**WARNING** : Worker process %3d run out of memory "
+                        "and reallocates. Potential work imbalancing\n", rank);
+                DEBUG("\n**WARNING** : Worker process %3d run out of memory "
+                      "and reallocates. Potential work imbalancing\n", rank);
 
                 // Use j as temporary again. Add two (or any other value) to avoid 0.
                 // (two is just a random value, you can put any value really...)
@@ -367,7 +387,8 @@ int correlationKernel(int rank,
                 // Reallocate and check
                 cor = (double *)realloc(cor, sizeof(double) * cor_cur_size);
                 if ( cor == NULL ) {
-                    ERR("**ERROR** : Memory re-allocation failed on worker process %d. Aborting.\n", rank);
+                    ERR("**ERROR** : Memory re-allocation failed on worker process %d. "
+                        "Aborting.\n", rank);
 
                     // Let the master process know its aborting in order to terminate
                     // the rest of the working workers
@@ -376,10 +397,12 @@ int correlationKernel(int rank,
 
                     // This worker failed
                     local_check = 1;
-                    MPI_Allreduce(&local_check, &global_check, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+                    MPI_Allreduce(&local_check, &global_check, 1, MPI_INT,
+                                  MPI_SUM, MPI_COMM_WORLD);
 
                     // Free all allocated memory
-                    free_all(cor, blocklens, indices, mean_value_vectorX, Sxx_vector, mean_value_vectorY, Syy_vector);
+                    free_all(cor, blocklens, indices, mean_value_vectorX,
+                             Sxx_vector, mean_value_vectorY, Syy_vector);
 
                     return -1;
                 }
@@ -419,9 +442,10 @@ int correlationKernel(int rank,
 
         // There are two possibilities
         //   (a) everything went well and all workers finished ok
-        //   (b) some processes finished ok but one or more of the remaining working workers failed
-        // To make sure all is well an all-reduce will be performed to sync all workers and guarantee success
-        // before moving on to write the output file
+        //   (b) some processes finished ok but one or more of the remaining
+        //       working workers failed
+        // To make sure all is well an all-reduce will be performed to sync all
+        // workers and guarantee success before moving on to write the output file
         // This worker is OK
         local_check = 0;
         MPI_Allreduce(&local_check, &global_check, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -429,14 +453,17 @@ int correlationKernel(int rank,
         // Check failed
         if ( global_check != 0 ) {
             // Free all allocated memory
-          free_all(cor, blocklens, indices, mean_value_vectorX, Sxx_vector, mean_value_vectorY, Syy_vector);
+          free_all(cor, blocklens, indices, mean_value_vectorX,
+                   Sxx_vector, mean_value_vectorY, Syy_vector);
             return -1;
         }
 
-        PROF(0, "\nPROF_stats (thread %3d) : Fair chunk of work : %d \t\t Allocated : %d \t\t Computed : %d\n",
+        PROF(0, "\nPROF_stats (thread %3d) : Fair chunk of work : %d "
+                "\t\t Allocated : %d \t\t Computed : %d\n",
                 rank, fair_chunk, cor_cur_size, coeff_count);
 
-        // If the distance_flag is set, then transform all correlation coefficients to distances
+        // If the distance_flag is set, then transform all correlation
+        // coefficients to distances
         if ( distance_flag == 1 ) {
             for(j=0; j < coeff_count; j++) {
                 cor[j] = 1 - cor[j];
@@ -450,7 +477,8 @@ int correlationKernel(int rank,
         }
 
         // Open the file handler
-        MPI_File_open(comm, out_filename, MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+        MPI_File_open(comm, out_filename, MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                      MPI_INFO_NULL, &fh);
 
         // Create the file view
         if ( coeff_count != 0 ) {
@@ -465,11 +493,12 @@ int correlationKernel(int rank,
         // Close file handler
         MPI_File_close(&fh);
 
-        if ( coeff_count != 0 )
-            MPI_Type_free(&coeff_index_dt);
+        if ( coeff_count != 0 ) {
+            MPI_Type_free(&coeff_index_dt); }
 
         // Free all allocated memory
-        free_all(cor, blocklens, indices, mean_value_vectorX, Sxx_vector, mean_value_vectorY, Syy_vector);
+        free_all(cor, blocklens, indices, mean_value_vectorX,
+                 Sxx_vector, mean_value_vectorY, Syy_vector);
     }
 
     return 0;

@@ -43,12 +43,12 @@ int correlation(int n,...) {
     // Get size and rank from communicator
     MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
     MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
-    
+
     DEBUG("Hello from %i/%i\n", worldRank, worldSize);
-    
+
     if (worldRank == 0) {
         if (n == 5) {
-          
+
           // Get input variables
           va_start(ap,n);
           dataMatrixX = va_arg(ap,double*);
@@ -58,7 +58,7 @@ int correlation(int n,...) {
           distance_flag = va_arg(ap,int);
           va_end(ap);
         } else if (n == 6) {
-          
+
           // Get input variables
           va_start(ap,n);
           dataMatrixX = va_arg(ap,double*);
@@ -69,10 +69,9 @@ int correlation(int n,...) {
           distance_flag = va_arg(ap,int);
           va_end(ap);
         } else {
-
           DEBUG("rank 0 passed incorrect arguments into correlation!");
         }
-        
+
         // Sent the dimensions to the slave processes
         MPI_Bcast(dimensions, 2, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -85,7 +84,8 @@ int correlation(int n,...) {
 
         // Get the dimensions from the master
         MPI_Bcast(dimensions, 2, MPI_INT, 0, MPI_COMM_WORLD);
-        DEBUG("Broadcasting dims on %i. Got %i, %i\n", worldRank, dimensions[WIDTH], dimensions[HEIGHT]);
+        DEBUG("Broadcasting dims on %i. Got %i, %i\n", worldRank,
+              dimensions[WIDTH], dimensions[HEIGHT]);
 
         // Get the number of arguments
         MPI_Bcast(&n, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -95,17 +95,22 @@ int correlation(int n,...) {
         out_filename = (char *)malloc(sizeof(char) * FILENAME_SZ);
 
         // Allocate memory for the input data array
-        dataMatrixX = (double *)malloc(sizeof(double) * dimensions[WIDTH] * dimensions[HEIGHT]);
+        dataMatrixX = (double *)malloc(sizeof(double)
+                                       * dimensions[WIDTH] * dimensions[HEIGHT]);
         if (n == MATRIX_Y_PRESENT) {
-          dataMatrixY = (double *)malloc(sizeof(double) * dimensions[WIDTH] * dimensions[HEIGHT]);
+          dataMatrixY = (double *)malloc(sizeof(double)
+                                         * dimensions[WIDTH] * dimensions[HEIGHT]);
         }
-        
+
         // Check memory and make sure all slave processes have allocated successfully.
         // Perform an all-reduce operation to make sure everything is ok and then
         // move on to broadcast the data
-        if ( (out_filename == NULL) || (dataMatrixX == NULL) || (n == MATRIX_Y_PRESENT && dataMatrixY == NULL)) {
+        if (    (out_filename == NULL) || (dataMatrixX == NULL)
+             || (n == MATRIX_Y_PRESENT && dataMatrixY == NULL))
+        {
             local_check = 1;
-            ERR("**ERROR** : Input data array memory allocation failed on slave process %d. Aborting.\n", worldRank);
+            ERR("**ERROR** : Input data array memory allocation failed on slave "
+                "process %d. Aborting.\n", worldRank);
         }
         else {
             local_check = 0;
@@ -133,22 +138,26 @@ int correlation(int n,...) {
     MPI_Bcast(&distance_flag, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     DEBUG("Broadcasting data X on %i.\n", worldRank);
-    MPI_Bcast(dataMatrixX, dimensions[WIDTH] * dimensions[HEIGHT], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(dataMatrixX, dimensions[WIDTH] * dimensions[HEIGHT], MPI_DOUBLE,
+              0, MPI_COMM_WORLD);
 
     if (n == MATRIX_Y_PRESENT) {
       DEBUG("Broadcasting data Y on %i.\n", worldRank);
-      MPI_Bcast(dataMatrixY, dimensions[WIDTH] * dimensions[HEIGHT], MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(dataMatrixY, dimensions[WIDTH] * dimensions[HEIGHT], MPI_DOUBLE,
+                0, MPI_COMM_WORLD);
     }
-    
+
     // Stop timer
     end_time = MPI_Wtime();
 
-    PROF(worldRank, "\nPROF_bcast (slaves=%d) : Time taken for bcast (filename, dims, data) : %g\n",
-         worldSize-1, end_time - start_time);
+    PROF(worldRank, "\nPROF_bcast (slaves=%d) : Time taken for bcast (filename, "
+                    "dims, data) : %g\n", worldSize-1, end_time - start_time);
 
     DEBUG("Running correlation kernel on %i\n", worldRank);
 
-    result = correlationKernel(worldRank, worldSize, dataMatrixX, dataMatrixY, dimensions[WIDTH], dimensions[HEIGHT], out_filename, distance_flag);
+    result = correlationKernel(worldRank, worldSize, dataMatrixX, dataMatrixY,
+                               dimensions[WIDTH], dimensions[HEIGHT], out_filename,
+                               distance_flag);
 
     DEBUG("Done running correlation kernel on %i\n", worldRank);
 
@@ -158,7 +167,7 @@ int correlation(int n,...) {
         free(dataMatrixY);
         free(out_filename);
     }
-    
+
     return result;
 }
 
