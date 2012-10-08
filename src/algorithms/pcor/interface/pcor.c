@@ -38,16 +38,16 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
     int response = 0, _distance = 0;
     char *file_out;
 
+    PROTECT(result = NEW_INTEGER(1));
+
     // Check that MPI is initialized
     MPI_Initialized(&response);
     if (response) {
         DEBUG("\nMPI is init'ed in pcor\n");
     } else {
         DEBUG("\nMPI is NOT init'ed in pcor\n");
-        PROTECT(result = NEW_INTEGER(1));
         INTEGER(result)[0] = -1;
         UNPROTECT(1);
-
         return result;
     }
 
@@ -55,25 +55,23 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
     // If the master is alone then abort the process
     MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
     if ( worldSize == 1 ) {
-        PROTECT(result = NEW_INTEGER(1));
         INTEGER(result)[0] = -2;
         UNPROTECT(1);
-
         return result;
     }
 
     // Perform checks on the input data
     if (!IS_VECTOR(data_x)) {
         ERR("\npcor.c accepts only matrices\n");
-        result = NEW_INTEGER(1);
         INTEGER(result)[0] = -1;
+        UNPROTECT(1);
         return result;
     }
 
     if (!IS_NUMERIC(data_x) && !IS_INTEGER(data_x)) {
         ERR("\npcor.c accepts only numeric matrices\n");
-        result = NEW_INTEGER(1);
         INTEGER(result)[0] = -1;
+        UNPROTECT(1);
         return result;
     }
 
@@ -81,14 +79,14 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
       // Perform checks on the input data
       if (!IS_VECTOR(data_y)) {
         ERR("\npcor.c accepts only matrices (data_y)\n");
-        result = NEW_INTEGER(1);
         INTEGER(result)[0] = -1;
+        UNPROTECT(1);
         return result;
       }
       if (!IS_NUMERIC(data_y) && !IS_INTEGER(data_y)) {
         ERR("\npcor.c accepts only numeric matrices (data_y)\n");
-        result = NEW_INTEGER(1);
         INTEGER(result)[0] = -1;
+        UNPROTECT(1);
         return result;
       }
     }
@@ -114,10 +112,8 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
                              width, height, file_out, 0);
     }
 
-    PROTECT(result = NEW_INTEGER(1));
     INTEGER(result)[0] = response;
     UNPROTECT(1);
-
     return result;
 }
 
