@@ -23,25 +23,30 @@
 
 ## consistent error / warning messages; could use for internationalization
 ..msg <- list(error =
-              c(non.double = "x must be of type double",
+              c(non.double = "Type of data_x must be double",
                 non.numeric = "PCOR only accepts numeric matrices",
-                no.dims = "Dimensios of x and y matrices do not match"
+                no.dims = "Dimensios of data_x and data_y matrices do not match",
+                null.data_x = "NULL x. Supply a matrix-like 'data_x'"
                 ), warn = c()
               )
 
 pcor <- function(
-  data_x                       # input numerical matrix
-, data_y = NULL                # matrix with compatible dimensions to data_x.
-, distance   = FALSE           # Return the distance matrix instead of the correlation coefficients
-, caching_   = "mmeachflush"   # getOption("ffcaching")
-, filename_  = NULL            # tempfile(pattern = pattern, tmpdir = getOption("fftempdir"))
-
+  data_x                        # input numerical matrix
+, data_y = NULL                 # matrix with compatible dimensions to data_x.
+, distance   = FALSE            # Return the distance matrix insteadof
+                                # the correlation coefficients
+, caching_   = "mmeachflush"    # getOption("ffcaching")
+, filename_  = NULL             # tempfile(pattern = pattern,
+                                #          tmpdir = getOption("fftempdir"))
 )
   {
 
-    # Load the "ff" package in case is not already loaded. Warn user in case the package is missing
+    # Load the "ff" package in case is not already loaded.
+    # Warn user in case the package is missing
     if( !require("ff", quietly=TRUE) ) {
-        warning("Function pcor was unable to execute - failed to load package \"ff\". Please check that the package is installed and try again.")
+        warning(paste("Function pcor was unable to execute - failed to load",
+                      "package \"ff\". Please check that the package is",
+                      "installed and try again."))
         return(NA)
     }
 
@@ -53,41 +58,64 @@ pcor <- function(
     # references to the ff object are closed
 
     if (is.null(filename_)){
-      # delete if temporary ff object
-      finalizer_<- "delete"
+        # delete if temporary ff object
+        finalizer_<- "delete"
     } else {
-      finalizer_<- "close"
-    }
-     
-    if (is.null(filename_)){
-      # temporary ff object
-      filename_<- tempfile(pattern =  "ff" , tmpdir = getwd())
+        finalizer_<- "close"
     }
 
-     # determine length of the result correlation matrix
-    
-    if (is.matrix(data_x) && is.numeric(data_x)) {
-      height = dim(data_x)[2]
-      length_ <- height * height
+    if (is.null(filename_)){
+        # temporary ff object
+        filename_<- tempfile(pattern =  "ff" , tmpdir = getwd())
     }
-    else
-      stop(..msg$error["non.numeric"])
+
+    # determine length of the result correlation matrix
+
+    # If input matrices are data frames transform to matrix before
+    # the checks
+    if(is.data.frame(data_y)) { y <- as.matrix(data_y) }
+    if(is.data.frame(data_x)) { x <- as.matrix(data_x) }
+
+    if (is.matrix(data_x) && is.numeric(data_x) &&
+        !is.null(data_x) && is.atomic(data_x))
+    {
+        height = dim(data_x)[2]
+        length_ <- height * height
+    }
+    else {
+        if(is.null(data_x)) {
+           stop(..msg$error["null.data_x"])
+        } else if (!is.atomic(data_x)) {
+            stop(..msg$error["non.atomic_x"])
+        } else {
+            stop(..msg$error["non.numeric"])
+        }
+    }
 
     if(!is.null(data_y)) {
-      if (!is.matrix(data_y) && !is.numeric(data_y))
-        stop(..msg$error["non.numeric"])
-      if (dim(data_x)[0] != dim(data_y)[0] && dim(data_x)[1] != dim(data_y)[1])
-        stop(..msg$error["no.dims"])
+        if (!is.matrix(data_y) && !is.numeric(data_y)) {
+            stop(..msg$error["non.numeric"])
+        } else if (!is.atomic(data_y)) {
+            stop(..msg$error["non.atomic_y"])
+        }
+
+        if (dim(data_x)[0] != dim(data_y)[0] &&
+            dim(data_x)[1] != dim(data_y)[1])
+        {
+            stop(..msg$error["no.dims"])
+        }
     }
 
-    if (is.null(caching_))
-      caching_<- getOption("ffcaching")
-    else
-      caching_<- match.arg(caching_, c("mmnoflush", "mmeachflush"))
+    if (is.null(caching_)) {
+        caching_<- getOption("ffcaching")
+    } else {
+        caching_<- match.arg(caching_, c("mmnoflush", "mmeachflush"))
+    }
 
     # Check the value of the "distance" option
     if ( (!is.logical(distance)) || (length(distance)>1) ) {
-        warning(paste("Value of option \"distance\" must be a scalar logical (TRUE of FALSE). You supplied : ", distance))
+        warning(paste("Value of option \"distance\" must be a scalar",
+                      "logical (TRUE of FALSE). You supplied : ", distance))
         return(FALSE)
     }
 
@@ -110,10 +138,15 @@ pcor <- function(
         )
     } else {
 
-        if ( return_val == -1 )
+        if ( return_val == -1 ) {
             warning(paste("MPI is not initialized. Function is aborted.\n"))
-        if ( return_val == -2 )
-            warning(paste("No worker processes exist. Function pcor() is aborted.\n"))
+        }
+
+        if ( return_val == -2 ) {
+            warning(paste("No worker processes exist. Function pcor()",
+                          "is aborted.\n"))
+        }
+
         result <- FALSE
     }
 
