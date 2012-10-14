@@ -22,44 +22,61 @@
 #include "kernel.h"
 #include "../../../sprint.h"
 
-// Percent of extra memory to be allocated for the correlation coefficients vector.
-// This extra memory is added to the approximate memory needed by a fair division of
-// all work assignments accross the workers. Small work imbalancing is expexted to
-// and this extra space is going to cover for it.
+/*!
+ * Percent of extra memory to be allocated for the correlation coefficients vector.
+ * This extra memory is added to the approximate memory needed by a fair division of
+ * all work assignments accross the workers. Small work imbalancing is expexted to
+ * and this extra space is going to cover for it.
+ */
 #define MEM_PERC 0.2
 
-// Pointer to allocate the local vector for the correlation
-// coefficients. Had some problems when declaring this pointer inside
-// "correlationKernel"... better here, everything works fine
-double *cor = NULL;
+/*!
+ * Pointer to allocate the local vector for the correlation
+ * coefficients. Had some problems when declaring this pointer inside
+ * "correlationKernel"... better here, everything works fine
+ */
+static double *cor = NULL;
 
 // Vectors for storing Pearson correlation parameters in order not to re-compute
 // them every time
-double *Sxx_vector = NULL;
-double *mean_value_vectorX = NULL;
-double *Syy_vector = NULL;
-double *mean_value_vectorY = NULL;
+static double *Sxx_vector = NULL;
+static double *mean_value_vectorX = NULL;
+static double *Syy_vector = NULL;
+static double *mean_value_vectorY = NULL;
 
-/* *************************************** *
- *  Free all dynamically allocated memory  *
- * *************************************** */
-void free_all(double *cor,
-              int *blocklens,
-              int *indices,
-              double *mean_value_vectorX,
-              double *Sxx_vector,
-              double *mean_value_vectorY,
-              double *Syy_vector);
+/*!
+ *  @brief  Free all dynamically allocated memory.
+ *  @param  cor
+ *  @param  blocklens
+ *  @param  indices
+ *  @param  mean_value_vectorX
+ *  @param  Sxx_vector
+ *  @param  mean_value_vectorY
+ *  @param  Syy_vector
+ */
+static void free_all(double *cor,
+                     int *blocklens,
+                     int *indices,
+                     double *mean_value_vectorX,
+                     double *Sxx_vector,
+                     double *mean_value_vectorY,
+                     double *Syy_vector);
 
-/* ************************************************************* *
- *  Compute parameters used by Pearson method                    *
- *  It will transform the input array to more meaningful values  *
- *  and also create vectors for the mean values and variances    *
- * ************************************************************* */
-void compute_parameters(double *dataMatrixX,
-                        double *dataMatrixY,
-                        int rows,
-                        int columns)
+/*!
+ *  @brief      
+ *  @details    Compute parameters used by Pearson method
+ *              It will transform the input array to more meaningful values
+ *              and also create vectors for the mean values and variances
+ *
+ *  @param  dataMatrixX
+ *  @param  dataMatrixY
+ *  @param  rows
+ *  @param  columns
+ */
+static void compute_parameters(double *dataMatrixX,
+                               double *dataMatrixY,
+                               const int rows,
+                               const int columns)
 {
 
     int i, j;
@@ -105,13 +122,18 @@ void compute_parameters(double *dataMatrixX,
     }
 }
 
-/* ****************************** *
- *  Pearson correlation function  *
- * ****************************** */
-double pearson(double *data,
-               int row_x,
-               int row_y,
-               int size)
+/*!
+ *  @brief  Pearson correlation function.
+ *  @param  
+ *  @param  
+ *  @param  
+ *  @param  
+ *  @return 
+ */
+static double pearson(double *data,
+                      const int row_x,
+                      const int row_y,
+                      const int size)
 {
     int i;
     double sxy = 0.0;
@@ -166,25 +188,22 @@ double pearson_XY(double *dataMatrixX,
     return r;
 }
 
-/* *************************** *
- *  Main computational kernel  *
- * *************************** */
-int correlationKernel(int rank,
-                      int size,
-                      double* dataMatrixX,
-                      double* dataMatrixY,
-                      int columns,
-                      int rows,
-                      char *out_filename,
-                      int distance_flag) {
-
-    int local_check = 0, global_check = 0;
+int correlationKernel(int rank, int size, double* dataMatrixX,
+                      double* dataMatrixY, int columns, int rows,
+                      char *out_filename, int distance_flag,
+                      int method_flag)
+{
+    int local_check = 0;
+    int global_check = 0;
     int i = 0, j, taskNo;
     int err, count = 0;
-    unsigned int fair_chunk = 0, coeff_count = 0;
-    unsigned int cor_cur_size = 0, init_and_cleanup_loop_iter=0;
+    unsigned int fair_chunk = 0;
+    unsigned int coeff_count = 0;
+    unsigned int cor_cur_size = 0;
+    unsigned int init_and_cleanup_loop_iter = 0;
 
-    double start_time, end_time;
+    double start_time;
+    double end_time;
 
     // Variables needed by the Indexed Datatype
     MPI_Datatype coeff_index_dt;
@@ -337,7 +356,8 @@ int correlationKernel(int rank,
             ERR("**ERROR** : Memory allocation failed on worker process %d. Aborting.\n", rank);
 
             // Free allocated memory
-            free_all(cor, blocklens, indices, mean_value_vectorX, Sxx_vector, mean_value_vectorY, Syy_vector);
+            free_all(cor, blocklens, indices, mean_value_vectorX,
+                     Sxx_vector, mean_value_vectorY, Syy_vector);
 
             // Let the master process know its aborting in order to terminate
             // the rest of the working workers
@@ -480,7 +500,8 @@ int correlationKernel(int rank,
         MPI_File_open(comm, out_filename, MPI_MODE_CREATE | MPI_MODE_WRONLY,
                       MPI_INFO_NULL, &fh);
 
-        // Create the file view
+        // Create the file view. If we have a datatype created use it, otherwise
+        // just use MPI_DOUBLE.
         if ( coeff_count != 0 ) {
             MPI_File_set_view(fh, 0, MPI_DOUBLE, coeff_index_dt, "native", MPI_INFO_NULL);
         } else {
