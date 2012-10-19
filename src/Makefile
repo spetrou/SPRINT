@@ -83,7 +83,7 @@ algorithms/ptest/implementation/test.o \
 algorithms/rng/implementation/sprint-rng-worker.o \
 
 SHARED_ALGORITHM_OBJS = \
-algorithms/common/functions.o \
+functions.o \
 algorithms/common/mmap.o \
 algorithms/common/serialize.o \
 algorithms/common/utils.o \

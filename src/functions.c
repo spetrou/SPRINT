@@ -25,8 +25,8 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "../../functions.h"
-#include "../../sprint.h"
+#include "functions.h"
+#include "sprint.h"
 
 /*
  * Declare the various command functions as external
