@@ -9,12 +9,12 @@
 
 #include "pearson.h"
 
-void pearson(double *data, const int row_x, double *result,
-             const int rows, const int columns, const double *Sxx_vector)
+void pearson_row(const double *data, const int row_x, double *result,
+                 const int rows, const int columns, const double *Sxx_vector)
 {
     int i, j;
     double sxy = 0.0;
-    double *x, *y;
+    const double *x, *y;
 
     // Make sure value is valid
     if ( columns <= 0 || rows <= 0) {
@@ -49,31 +49,59 @@ void pearson(double *data, const int row_x, double *result,
     }
 }
 
-//double pearson_XY(double *dataMatrixX,
-//                  double *dataMatrixY,
-//                  int row_x,
-//                  int row_y,
-//                  int size)
-//{
-//    int i;
-//    double sxy = 0.0;
-//    double r;
-//    double *x, *y;
-//
-//    x = &dataMatrixX[row_x*size];
-//    y = &dataMatrixY[row_y*size];
-//
-//    // correlation
-//    for (i=0; i<size; i++) {
-//        sxy += x[i] * y[i];
-//    }
-//
-//    sxy /= (size-1);
-//
-//    // This *should* set r=NAN if sxx*syy = 0 *and*
-//    // sxy = 0 - this replicates R's behaviour
-//    r = sxy / sqrt(Sxx_vector[row_x]*Syy_vector[row_y]);
-//
-//    return r;
-//}
+
+double pearson(const double *data,
+               const int row_x,
+               const int row_y,
+               const int size,
+               const double *Sxx_vector)
+{
+    int i = 0;
+    double sxy = 0.0;
+    double r = 0.0;
+    const double *x = NULL, *y = NULL;
+
+    x = &data[row_x*size];
+    y = &data[row_y*size];
+
+    // Correlation
+    for (i=0; i<size; i++) {
+        sxy += x[i] * y[i];   
+    }
+
+    sxy /= (size-1);
+
+    // This *should* set NAN if sxx*syy = 0 *and*
+    // sxy = 0 - this replicates R's behaviour
+    return sxy / sqrt(Sxx_vector[row_x]*Sxx_vector[row_y]);
+}
+
+
+double pearson_XY(const double *dataMatrixX,
+                  const double *dataMatrixY,
+                  const int row_x,
+                  const int row_y,
+                  const int size,
+                  const double *Sxx_vector,
+                  const double *Syy_vector)
+{
+    int i;
+    double sxy = 0.0;
+    double r;
+    const double *x, *y;
+
+    x = &dataMatrixX[row_x*size];
+    y = &dataMatrixY[row_y*size];
+
+    // correlation
+    for (i=0; i<size; i++) {
+        sxy += x[i] * y[i];
+    }
+
+    sxy /= (size-1);
+
+    // This *should* set NAN if sxx*syy = 0 *and*
+    // sxy = 0 - this replicates R's behaviour
+    return sxy / sqrt(Sxx_vector[row_x]*Syy_vector[row_y]);
+}
 

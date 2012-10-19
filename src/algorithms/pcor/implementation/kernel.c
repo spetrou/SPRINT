@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include "kernel.h"
+#include "pearson.h"
 #include "../../../sprint.h"
 
 /*!
@@ -122,71 +123,6 @@ static void compute_parameters(double *dataMatrixX,
     }
 }
 
-/*!
- *  @brief  Pearson correlation function.
- *  @param  
- *  @param  
- *  @param  
- *  @param  
- *  @return 
- */
-static double pearson(double *data,
-                      const int row_x,
-                      const int row_y,
-                      const int size)
-{
-    int i;
-    double sxy = 0.0;
-    double r;
-    double *x, *y;
-
-    x = &data[row_x*size];
-    y = &data[row_y*size];
-
-    // Correlation
-    for (i=0; i<size; i++) {
-        sxy += x[i] * y[i];   
-    }
-
-    sxy /= (size-1);
-
-    // This *should* set r=NAN if sxx*syy = 0 *and*
-    // sxy = 0 - this replicates R's behaviour
-    r = sxy / sqrt(Sxx_vector[row_x]*Sxx_vector[row_y]);
-
-    return r;
-}
-
-/* **************************************************** *
- *  Pearson correlation function for two input matrices *
- * **************************************************** */
-double pearson_XY(double *dataMatrixX,
-                  double *dataMatrixY,
-                  int row_x,
-                  int row_y,
-                  int size)
-{
-    int i;
-    double sxy = 0.0;
-    double r;
-    double *x, *y;
-
-    x = &dataMatrixX[row_x*size];
-    y = &dataMatrixY[row_y*size];
-
-    // correlation
-    for (i=0; i<size; i++) {
-        sxy += x[i] * y[i];
-    }
-
-    sxy /= (size-1);
-
-    // This *should* set r=NAN if sxx*syy = 0 *and*
-    // sxy = 0 - this replicates R's behaviour
-    r = sxy / sqrt(Sxx_vector[row_x]*Syy_vector[row_y]);
-
-    return r;
-}
 
 int correlationKernel(int rank, int size, double* dataMatrixX,
                       double* dataMatrixY, int columns, int rows,
@@ -431,7 +367,8 @@ int correlationKernel(int rank, int size, double* dataMatrixX,
             // Compute the correlation coefficients
             if(dataMatrixY != NULL) {
               for (j=0; j < rows; j++) {
-                cor[coeff_count] = pearson_XY(dataMatrixX, dataMatrixY, j, taskNo, columns);
+                cor[coeff_count] = pearson_XY(dataMatrixX, dataMatrixY, j, taskNo,
+                                              columns, Sxx_vector, Syy_vector);
                 coeff_count++;
               }
 
@@ -443,7 +380,8 @@ int correlationKernel(int rank, int size, double* dataMatrixX,
                   coeff_count++;
                   continue;
                 }
-                cor[coeff_count] = pearson(dataMatrixX, taskNo, j, columns);
+                cor[coeff_count] = pearson(dataMatrixX, taskNo,
+                                           j, columns, Sxx_vector);
                 coeff_count++;
               }
             }
