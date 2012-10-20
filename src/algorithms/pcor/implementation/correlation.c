@@ -22,23 +22,36 @@
 #include "kernel.h"
 #include "../../../sprint.h"
 
-#define WIDTH 0
-#define HEIGHT 1
-#define FILENAME_SZ 256
-#define MATRIX_Y_PRESENT 6
-
+#define WIDTH 0             /*! Index of width in dimensions array */
+#define HEIGHT 1            /*! Index of heigth in dimensions array */
+#define FILENAME_SZ 256     /*! Maximum name allowed for a file */
+#define MATRIX_Y_PRESENT 6  /*! Argument count when array 'y' is present */
 
 int correlation(int n,...) {
-    int result = 0;
-    va_list ap; /*will point to each unnamed argument in turn*/
-    int worldSize, worldRank;
-    double *dataMatrixX = NULL;
-    double *dataMatrixY = NULL;
-    int dimensions[2];
-    char *out_filename = NULL;
-    int local_check = 0, global_check = 0;
-    int distance_flag=0;
-    double start_time, end_time;
+    int result = 0;             /*! Error code sent back to R */
+    va_list ap;                 /*! Will point to each unnamed argument */
+    int worldSize, worldRank;   /*! MPI World size and process rank */
+    double *dataMatrixX = NULL; /*! Pointer to the beginning of array 'x' */
+    double *dataMatrixY = NULL; /*! Pointer to the beginning of array 'y' */
+    int dimensions[2];          /*! Array of dimensions for input arrays */
+    char *out_filename = NULL;  /*! String holding the name of the final
+                                    results file */
+    int local_check = 0;        /*! Flag used for local error handling */
+    int global_check = 0;       /*! Flag used for global error handling */
+    int distance_flag = 0;      /*! Flag indicating if final result should be
+                                    transformed into a 'distance' metric
+                                    (1 - result). See static local variables
+                                    for enumeration. */
+    enum CORRELATION_METHOD method_flag;
+                                /*! Flag indicating the correlation method */
+    double start_time;          /*! Used for time measurements */
+    double end_time;            /*! Used for time measurements */
+
+    // FIXME:   Change this to be read from input arguments.
+    //          Also maybe remove the enum? What R sends down to
+    //          C interface must be consistent and portable if the
+    //          enumeration changes.
+    method_flag = PEARSON;
 
     // Get size and rank from communicator
     MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
@@ -46,7 +59,7 @@ int correlation(int n,...) {
 
     DEBUG("Hello from %i/%i\n", worldRank, worldSize);
 
-    if (worldRank == 0) {
+    if (worldRank == MASTER_PROCESS_RANK) {
         if (n == 5) {
 
           // Get input variables
@@ -132,10 +145,13 @@ int correlation(int n,...) {
 
     // Broadcast the output filename
     MPI_Bcast(out_filename, FILENAME_SZ, MPI_CHAR, 0, MPI_COMM_WORLD);
-    DEBUG("Broadcasting output filename on %i. Got %s\n", worldRank, out_filename);
+    DEBUG("Broadcast of output filename on %i. Got [%s]\n", worldRank, out_filename);
 
-    DEBUG("Broadcasting distance flag on %i.\n", worldRank);
     MPI_Bcast(&distance_flag, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    DEBUG("Broadcast of distance flag on %i. Got [%d]\n", worldRank, distance_flag);
+
+    MPI_Bcast(&method_flag, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    DEBUG("Broadcast of method flag on %i. Got [%d]\n", worldRank, method_flag);
 
     DEBUG("Broadcasting data X on %i.\n", worldRank);
     MPI_Bcast(dataMatrixX, dimensions[WIDTH] * dimensions[HEIGHT], MPI_DOUBLE,
@@ -157,7 +173,7 @@ int correlation(int n,...) {
 
     result = correlationKernel(worldRank, worldSize, dataMatrixX, dataMatrixY,
                                dimensions[WIDTH], dimensions[HEIGHT], out_filename,
-                               distance_flag);
+                               distance_flag, method_flag);
 
     DEBUG("Done running correlation kernel on %i\n", worldRank);
 

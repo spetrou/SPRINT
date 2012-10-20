@@ -21,6 +21,12 @@
 #ifndef _CORRELATION_KERNEL_H
 #define _CORRELATION_KERNEL_H
 
+enum CORRELATION_METHOD {
+    PEARSON = 0,
+    SPEARS  = 1,
+    KENDALL = 2
+};
+
 // FIXME:   Move this in 'sprint.h'?? It should really be shared
 //          to everyone. 'static' should not be needed, not it needs it
 //          to avoid multiple definition.
