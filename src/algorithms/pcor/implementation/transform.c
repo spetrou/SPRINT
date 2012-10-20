@@ -8,6 +8,7 @@
  */
 
 #include "transform.h"
+#include "../../../sprint.h"
 
 /*!
  *  @brief  Comparison function for QuickSort.
@@ -18,28 +19,95 @@
 static int func_cmp(const void *v1,
                     const void *v2);
 
-/* Pointer used with QuickSort */
+/*! @brief Pointer used in QuickSort */
 static double *gp_arr;
 
-void transform_to_expected(double *data, const int rows, const int columns,
-                           double *Sxx_vector)
+unsigned int transform_to_expected_with_alloc(double *data, const int rows,
+                                              const int columns, double *Sxx_vector,
+                                              double *mean_value_vector)
 {
-    int i, j;
-    double *mean_value_vector;
+    double *new_expected = NULL;    /*! Temporary variable for memory allocation */
+    double *new_mean = NULL;        /*! Temporary variable for memory allocation */
+    unsigned int rcode = 0;         /*! Return code */
 
-    // Make sure value is valid
+    // Check dimensions are valid
     if ( columns <= 0 || rows <= 0) {
-        printf("\nRow/column size passed to \"transform_to_ranks\" function invalid.\n");
-        printf("\nValues remain as they were before the call.\n");
-        return;
+        ERR("\nRow/column sizes in \"%s\" invalid. rows[%d], columns[%d]\n",
+            "transform_to_expected_with_alloc", rows, columns);
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
     }
 
-    mean_value_vector = (double *)malloc(sizeof(double) * rows);
+    if(data == NULL) {
+        ERR("\nInput array pointer is null in \"%s\"",
+            "transform_to_expected_with_alloc");
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
+    }
 
-    if( mean_value_vector == NULL ) {
-        printf("\nMemory allocation in \"transform_to_expected\" function failed.\n");
-        printf("\nValues remain as they were before the call.\n");
-        return;
+    // Allocate memory for vectors.
+    new_mean = (double *)malloc(sizeof(double) * rows);
+    if(new_mean == NULL) {
+        ERR("\nMemory allocation in \"%s\", for \"%s\" failed.\n", 
+            "transform_to_expected_with_alloc", "mean_value_vector");
+        return RCODE_MEMORY_ALLOC_FAIL;
+    }
+
+    new_expected = (double *)malloc(sizeof(double) * rows);
+    if(new_expected == NULL) {
+        ERR("\nMemory allocation in \"%s\", for \"%s\" failed.\n", 
+            "transform_to_expected_with_alloc", "Sxx_vector");
+        // Don't forget to free the mean vector's memory
+        free(new_mean);
+        return RCODE_MEMORY_ALLOC_FAIL;
+    }
+
+    Sxx_vector = new_expected;
+    mean_value_vector = new_mean;
+
+    rcode = transform_to_expected(data, rows, columns,
+                                  Sxx_vector, mean_value_vector);
+
+    // Free memory on failure.
+    if(rcode)
+    {
+        free(Sxx_vector);
+        free(mean_value_vector);
+        Sxx_vector = NULL;
+        mean_value_vector = NULL;
+    }
+
+    return rcode;
+}
+
+
+unsigned int transform_to_expected(double *data, const int rows,
+                                   const int columns, double *Sxx_vector,
+                                   double *mean_value_vector)
+{
+    int i = 0;  /*! Temporary ndex for rows */
+    int j = 0;  /*! Temporary index for columns */
+
+    // Check dimensions are valid
+    if ( columns <= 0 || rows <= 0) {
+        ERR("\nRow/column sizes in \"%s\" invalid. rows[%d], columns[%d]\n",
+            "transform_to_expected", rows, columns);
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
+    }
+
+    if(data == NULL) {
+        ERR("\nInput array pointer is null in \"%s\"", "transform_to_expected");
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
+    }
+
+    if(mean_value_vector == NULL) {
+        ERR("\nMemory allocation in \"%s\", for \"%s\" failed.\n", 
+            "transform_to_expected", "mean_value_vector");
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
+    }
+
+    if(Sxx_vector == NULL) {
+        ERR("\nMemory allocation in \"%s\", for \"%s\" failed.\n", 
+            "transform_to_expected", "Sxx_vector");
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
     }
 
 #pragma omp parallel shared(mean_value_vector, Sxx_vector, data) \
@@ -68,23 +136,21 @@ void transform_to_expected(double *data, const int rows, const int columns,
     }
 } // end of parallel region
 
-    free(mean_value_vector);
+    return RCODE_SUCCESS;
 }
 
 
-
-/* ********************************************* *
- *  Function to transform input values to ranks  *
- * ********************************************* */
-void transform_to_ranks(double *data, const int rows, const int columns)
+unsigned int transform_to_ranks(double *data, const int rows, const int columns)
 {
-    int i, j, *R = NULL;
+    int i = 0;      /*! Temporary ndex for rows */
+    int j = 0;      /*! Temporary index for columns */
+    int *R = NULL;  /*! Index vector for QuickSort algorithm */
 
     // Make sure value is valid
     if ( columns <= 0 || rows <= 0) {
-        printf("\nRow/column size passed to \"transform_to_ranks\" function invalid.\n");
-        printf("\nValues remain as they were before the call.\n");
-        return;
+        ERR("\nRow/column sizes in \"%s\" invalid. rows[%d], columns[%d]\n",
+            "transform_to_ranks", rows, columns);
+        return RCODE_INPUT_PARAMETER_CHECKS_FAIL;
     }
 
     // Set the pointer to the beginning of the data array
@@ -94,8 +160,8 @@ void transform_to_ranks(double *data, const int rows, const int columns)
 {
     // Allocate space for R
     if ( (R = (int *)malloc(columns * sizeof(int))) == NULL ) {
-        printf("\nMemory allocation in \"transform_to_ranks\" function failed.\n");
-        printf("\nValues remain as they were before the call.\n");
+        ERR("\nMemory allocation in \"transform_to_ranks\" function failed.\n");
+        ERR("\nValues remain as they were before the call.\n");
         exit(EXIT_FAILURE);
     }
 
@@ -121,6 +187,7 @@ void transform_to_ranks(double *data, const int rows, const int columns)
 
 } // end of parallel region
 
+    return RCODE_SUCCESS;
 }
 
 
