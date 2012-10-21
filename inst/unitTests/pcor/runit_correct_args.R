@@ -27,8 +27,9 @@
 
 test.correct_args <- function() {
 
-    size_of_rows <- 1000
-    size_of_columns <- 50
+    size_of_rows <- 2000
+    size_of_columns <- 100
+    number_of_tests <- 5
 
     pcor_distance <- c(FALSE, TRUE)
 
@@ -41,10 +42,9 @@ test.correct_args <- function() {
     sink(file=temp_output_sink, append=FALSE)
 
     # ----------------------------------------------------------------------------
-    #  For loop to check the result of the pcor (normal correlation coefficients)
-    #  Executes the same test with 5 different random arrays
+    #  Test Pearson correlation computation.
     # ----------------------------------------------------------------------------
-    for(i in 1:5 ) {
+    for(i in 1:number_of_tests ) {
 
         # Create a random array for input
         input_dataset <- rnorm(size_of_rows * size_of_columns)
@@ -64,10 +64,9 @@ test.correct_args <- function() {
     }
 
     # ----------------------------------------------------------------------------
-    #  For loop to check the result of the pcor (normal correlation coefficients)
-    #  Executes the same test with 5 different random arrays
+    #  Test Pearson correlation computation *with* the 'distance' flag set.
     # ----------------------------------------------------------------------------
-    for(i in 1:5 ) {
+    for(i in 1:number_of_tests ) {
 
         # Create a random array for input
         input_dataset <- rnorm(size_of_rows * size_of_columns)
