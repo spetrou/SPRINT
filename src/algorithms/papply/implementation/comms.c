@@ -90,7 +90,7 @@ void bcastRFunction(SEXP function, int function_nlines, int worldRank) {
     
     if (worldRank == MASTER_PROCESS) {
       strncpy(msg_buffer, (char *)CHAR((STRING_ELT(function,i))), line_length);
-      msg_buffer[line_length] = '\0';
+      msg_buffer[line_length-1] = '\0';
     }
     
     /* broadcast a line of function definition / name */

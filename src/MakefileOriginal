@@ -25,8 +25,6 @@ IMPLEMENTATION_OBJS = algorithms/papply/implementation/apply.o algorithms/papply
 
 SHARED_ALGORITHM_OBJS = algorithms/common/functions.o algorithms/common/mmap.o algorithms/common/serialize.o algorithms/common/utils.o
 
-OS := $(shell uname)
-
 # * **************************************************************** *
 # *  Compiler flags additional to the ones R automatically provides  *
 # * **************************************************************** *
@@ -44,26 +42,20 @@ all: sprint.so
 # * **************************************** *
 
 sprint.so: $(INTERFACE_OBJS) $(SHARED_ALGORITHM_OBJS) $(SHLIB_OBJS) $(IMPLEMENTATION_OBJS)
-ifeq (Darwin,$(OS))
-ifeq (mpicc,$(findstring mpicc,$(MPICC)))
-	$(MPICC)  -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup  -o $@ $^ -LR -Wl,-framework -Wl,CoreFoundation
-else
-
-endif
-else
 ifeq (mpicc,$(findstring mpicc,$(MPICC)))
 	$(MPICXX) -shared -o $@ $^
 else
 	$(CC) -shared -o $@ $^ $(MPILIBS)
 endif
-endif
 
-%.o: %.cpp $(MAKEFILE)
+.cpp.o:
 	$(MPICXX) $(LOCAL_CFLAGS) -I$(R_INCLUDE_DIR) -c -o $@ $< 
 
-%.o: %.c $(MAKEFILE)
+.c.o:
 	$(MPICC) $(LOCAL_CFLAGS) -I$(R_INCLUDE_DIR) -c -o $@ $< 
-
+# * ****************************************** *
+# *  Create object files for each main target  *
+# * ****************************************** *
 # * ****************************** *
 # *  Clean up the build directory  *
 # * ****************************** *
@@ -72,4 +64,5 @@ endif
 clean:
 	find . -name "*.o" -exec rm -f {} \;
 	rm -f sprint.so
+
 

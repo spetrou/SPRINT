@@ -51,8 +51,8 @@ pboot <- function(data, statistic, R, sim = "ordinary",
   strata <- tapply(seq_len(n),as.numeric(strata))
   t0 <- if (sim != "parametric") {
     if ((sim == "antithetic") && is.null(L))
-      L <- empinf(data = data, statistic = statistic,
-                  stype = stype, strata = strata, ...)
+      L <- boot::empinf(data = data, statistic = statistic,
+                        stype = stype, strata = strata, ...)
     if (sim != "ordinary") m <- 0
     else if (any(m < 0)) stop("negative value of m supplied")
     if ((length(m) != 1L) && (length(m) != length(table(strata))))
@@ -63,8 +63,8 @@ pboot <- function(data, statistic, R, sim = "ordinary",
     else weights <- NULL
     if (!is.null(weights))
       weights <- t(apply(matrix(weights, n, length(R), byrow = TRUE),
-                         2L, normalize, strata))
-    if (!simple) i <- index.array(n, R, sim, strata, m, L, weights)
+                         2L, boot:::normalize, strata))
+    if (!simple) i <- boot:::index.array(n, R, sim, strata, m, L, weights)
     
     original <- if (stype == "f") rep(1, n)
     else if (stype == "w") {
@@ -93,7 +93,7 @@ pboot <- function(data, statistic, R, sim = "ordinary",
       i <- i[, seq_len(n)]
     }
     if (stype %in% c("f", "w")) {
-      f <- freq.array(i)
+      f <- boot:::freq.array(i)
       rm(i)
       if (stype == "w") f <- f/ns
       if (sum(m) == 0L) function(r) statistic(data, f[r,  ], ...)
@@ -103,7 +103,7 @@ pboot <- function(data, statistic, R, sim = "ordinary",
     else if (simple)
       function(r)
         statistic(data,
-                  index.array(n, 1, sim, strata, m, L, weights), ...)
+                  boot:::index.array(n, 1, sim, strata, m, L, weights), ...)
     else function(r) statistic(data, i[r, ], ...)
   }
   RR <- sum(R)
@@ -114,132 +114,8 @@ pboot <- function(data, statistic, R, sim = "ordinary",
 
   t.star <- matrix(, RR, length(t0))
   for(r in seq_len(RR)) t.star[r, ] <- res[[r]]
-  
+
   if (is.null(weights)) weights <- 1/tabulate(strata)[strata]
-  boot.return(sim, t0, t.star, temp.str, R, data, statistic, stype, call,
-              seed, L, m, pred.i, weights, ran.gen, mle)
-}
-
-boot.return <- function(sim, t0, t, strata, R, data, stat, stype, call,
-			seed, L, m, pred.i, weights, ran.gen, mle)
-                                        #
-# Return the results of a bootstrap in the form of an object of class
-# "boot".
-#
-{
-  out <- list(t0=t0, t=t, R=R, data=data, seed=seed,
-              statistic=stat, sim=sim, call=call)
-  if (sim == "parametric")
-    out <- c(out, list(ran.gen=ran.gen, mle=mle))
-  else if (sim == "antithetic")
-    out <- c(out, list(stype=stype, strata=strata, L=L))
-  else if (sim == "ordinary") {
-    if (sum(m) > 0)
-      out <- c(out, list(stype=stype, strata=strata,
-                         weights=weights, pred.i=pred.i))
-    else 	out <- c(out, list(stype=stype, strata=strata,
-                                   weights=weights))
-  } else if (sim == "balanced")
-    out <- c(out, list(stype=stype, strata=strata,
-                           weights=weights ))
-  else
-    out <- c(out, list(stype=stype, strata=strata))
-  class(out) <- "boot"
-  out
-}
-
-index.array <- function(n, R, sim, strata=rep(1,n), m=0, L=NULL, weights=NULL)
-{
-#
-#  Driver function for generating a bootstrap index array.  This function
-#  simply determines the type of sampling required and calls the appropriate
-#  function.
-#
-  indices <- NULL
-  if (is.null (weights)) {
-    if (sim == "ordinary") {
-      indices <- ordinary.array(n, R, strata)
-      if (sum(m) > 0)
-        indices <- cbind(indices, extra.array(n, R, m, strata))
-    }
-    else if (sim == "balanced")
-      indices <- balanced.array(n, R, strata)
-    else if (sim == "antithetic")
-      indices <- antithetic.array(n, R, L, strata)
-    else if (sim == "permutation")
-      indices <- permutation.array(n, R, strata)
-  } else {
-    if (sim == "ordinary")
-      indices <- importance.array(n, R, weights, strata)
-    else if (sim == "balanced")
-      indices <- importance.array.bal(n, R, weights, strata)
-  }
-  indices
-}
-
-ordinary.array <- function(n, R, strata)
-{
-#
-# R x n array of bootstrap indices, resampled within strata.
-# This is the function which generates a regular bootstrap array
-# using equal weights within each stratum.
-#
-  inds <- as.integer(names(table(strata)))
-  if (length(inds) == 1L) {
-    output <- sample.int(n, n*R, replace=TRUE)
-    dim(output) <- c(R, n)
-  } else {
-    output <- matrix(as.integer(0L), R, n)
-    for(is in inds) {
-      gp <- seq_len(n)[strata == is]
-      output[, gp] <- if (length(gp) == 1) rep(gp, R) else bsample(gp, R*length(gp))
-    }
-  }
-  output
-}
-
-
-freq.array <- function(i.array)
-{
-#
-# converts R x n array of bootstrap indices into
-# R X n array of bootstrap frequencies
-#
-  result <- NULL
-  n <- ncol(i.array)
-  result <- t(apply(i.array, 1, tabulate, n))
-  result
-}
-
-permutation.array <- function(n, R, strata)
-{
-#
-# R x n array of bootstrap indices, permuted within strata.
-# This is similar to ordinary array except that resampling is
-# done without replacement in each row.
-#
-  output <- matrix(rep(seq_len(n), R), n, R)
-  inds <- as.integer(names(table(strata)))
-  for(is in inds) {
-    group <- seq_len(n)[strata == is]
-    if (length(group) > 1L) {
-      g <- apply(output[group,  ], 2L, rperm)
-      output[group,  ] <- g
-    }
-  }
-  t(output)
-}
-
-normalize <- function(wts, strata)
-{
-#
-# Normalize a vector of weights to sum to 1 within each strata.
-#
-  n <- length(strata)
-  out <- wts
-  inds <- as.integer(names(table(strata)))
-  for (is in inds) {
-    gp <- seq_len(n)[strata == is]
-    out[gp] <- wts[gp]/sum(wts[gp]) }
-  out
+  boot:::boot.return(sim, t0, t.star, temp.str, R, data, statistic, stype,
+                     call, seed, L, m, pred.i, weights, ran.gen, mle)
 }

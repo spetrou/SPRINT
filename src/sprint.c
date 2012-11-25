@@ -35,7 +35,7 @@
 extern commandFunction commandLUT[];
 static int mpi_init_flag = -1;
 
-void worker();
+SEXP worker();
 
 /* *********************************************************** *
  *  Initialise MPI environment. "Borrowed" from Rmpi (Hao Yu)  *
@@ -120,7 +120,7 @@ SEXP sprint_shutdown() {
  *  They must sort that out themselves.                            *
  * *************************************************************** */
 
-void worker() {
+SEXP worker() {
 
     enum commandCodes commandCode;
     int response;
@@ -131,7 +131,7 @@ void worker() {
     MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
 
     if ( worldRank == 0 ) {
-        return;
+        return ScalarInteger(worldRank);
     }
     /* Start the command processing loop */
 
@@ -175,9 +175,9 @@ void worker() {
     DEBUG("%i: End logging\n", worldRank);
 
     R_CleanTempDir();
-    exit(0);
 
-    return;
-
+    // Return the MPI rank of the process. This value is needed in R
+    // to identify the 'worker' MPI processes and handle their shutdown.
+    return ScalarInteger(worldRank);
 }
 

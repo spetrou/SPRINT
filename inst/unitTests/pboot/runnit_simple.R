@@ -36,19 +36,25 @@ test.simple <- function() {
   set.seed(88)
   a = boot(discoveries, simplefunc, 1001)
   set.seed(88)
-  b = pboot(discoveries, simplefunc, 1001)
+	b = pboot(discoveries, simplefunc, 1001)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test simple default")
   
   set.seed(88)
   a = boot(discoveries, simplefunc, 1001, simple=TRUE)
   set.seed(88)
-  b = pboot(discoveries, simplefunc, 1001, simple=TRUE)
+	b = pboot(discoveries, simplefunc, 1001, simple=TRUE)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test simple equals true")
   
   set.seed(88)
   a = boot(discoveries, simplefunc, 1001,  simple=FALSE)
   set.seed(88)
-  b = pboot(discoveries, simplefunc, 1001, simple=FALSE)
+	b = pboot(discoveries, simplefunc, 1001, simple=FALSE)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test simple equals false")
 
 }

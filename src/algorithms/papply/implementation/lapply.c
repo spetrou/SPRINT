@@ -47,16 +47,15 @@ SEXP listApply(SEXP result, SEXP data, SEXP function,
     /* Function SEXP object is a vector of strings, each element contains
        a single line of a function definition */
     function_nlines = length(function);
-    
-  } else {
-    /* Allocate a vector to hold multiline function definitions */
-    PROTECT(function = allocVector(STRSXP, function_nlines));
   }
-    
   /* Bcast number of elements in the list and length of function def */
   MPI_Bcast(&list_length, 1, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(&function_nlines, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
+  if (worldRank != MASTER_PROCESS) {
+      /* Allocate a vector to hold multiline function definitions */
+      PROTECT(function = allocVector(STRSXP, function_nlines));
+  }
    /* Bcast function name or definition, cover cases when definition is split into
      several lines and stored as a SEXP string vector */
   bcastRFunction(function, function_nlines, worldRank); 

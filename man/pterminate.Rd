@@ -2,7 +2,7 @@
 \alias{pterminate}
 \title{SPRINT close}
 \description{
-Dunction which indicates the end of the use of the SPRINT library. It 
+Function which indicates the end of the use of the SPRINT library. It 
 terminates the use of MPI and shut down the SPRINT library. It must be used 
 with every script that invokes the SPRINT package.
 }

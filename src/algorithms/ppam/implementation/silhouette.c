@@ -63,7 +63,7 @@ void silhouette(int my_rank, int world_size, int my_start, int my_end,
 	    for (k_ = 0; k_ < n_clusters; k_++) if (k_ != k) {
 		double db = 0.;
 		int nbb = 0;
-		for (l = 0; l <= n_rows; l++) if (ncluv[l] == k_+1) {
+		for (l = 0; l < n_rows; l++) if (ncluv[l] == k_+1) {
 		    ++nbb;
 		    if (l != nj)          
           db += distance_matrix[DIST_INDEX(nj,l,n_rows)];

@@ -23,6 +23,8 @@
                 no_file = "Output filename is missing"
                 ), warn = c()
               )
+              
+library(ShortRead)
 
 phamming.distance <- function (data, output_filename) {
 
@@ -32,7 +34,7 @@ phamming.distance <- function (data, output_filename) {
   if (is.null(output_filename)) stop(..msg$error["empty"])
   
   if (objectType=='ShortReadQ') {  
-    data <- sread(data)
+    data <- ShortRead::sread(data)
   } else if (objectType!='DNAStringSet') {
     stop(..msg$error["non.dna"])
   }

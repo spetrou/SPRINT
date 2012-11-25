@@ -18,7 +18,9 @@
 #                                                                        #
 ##########################################################################
 
-
+library("RUnit")
+library("boot")
+library("sprint")
 
 mfun <- function(d, ind, mym){
  x = d[ind]
@@ -32,7 +34,9 @@ test.mn <- function() {
   set.seed(88)
   a = boot(discoveries, mfun, 1638,  m=1)
   set.seed(88)
-  b = pboot(discoveries, mfun, 1638,  m=1)
+	b = pboot(discoveries, mfun, 1638,  m=1)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test with just m=1")
 }
 

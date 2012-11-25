@@ -133,7 +133,7 @@ SEXP psvm(SEXP x,
   // broadcast command to other processors
   commandCode = PSVM;
   
-  MPI_Bcast(&commandCode, 1, MPI_INTEGER, 0, MPI_COMM_WORLD);
+  MPI_Bcast(&commandCode, 1, MPI_INT, 0, MPI_COMM_WORLD);
   
   response = svm_call( 3, x_matrix, y_vector, p);
   
