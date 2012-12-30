@@ -1,3 +1,6 @@
+VERSION sprint 1.0.4
+	o Added support for Mac OSX and fixed a bug in ppam.
+
 VERSION sprint 1.0.2
 
     o Fixed the issue with filling the $clusinfo[] and $silinfo$avg.width values in ppam

@@ -4,6 +4,7 @@ Version: 1.0.4
 Date: 2012-10-23
 Author: University of Edinburgh SPRINT Team <sprint@ed.ac.uk>
 Maintainer: Eilidh Troup <e.troup@epcc.ed.ac.uk>
+Contact: University of Edinburgh SPRINT Team <sprint@ed.ac.uk>
 Depends: R (>= 2.9.2), rlecuyer
 Suggests: ff (>= 2.1-1), randomForest, RankProd, cluster, multtest,
         IRanges, RUnit, Matrix, SparseM, slam

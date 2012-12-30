@@ -12,12 +12,15 @@ scripts.
  
 Multi-core or HPC platform running:
 
-*   R - latest version, SPRINT was tested using 2.14.0, 2.12.1, 2.10.1, 2.10.0
+*   R - latest version, SPRINT was tested using 2.15.1, 2.14.0, 2.12.1, 2.10.1, 2.10.0
         and 2.9.2.
 *   MPI2 - any version will full MPI-2 support will work, although there are 
            complications when using non-gcc compilers. MPICH2 is preferred.            
 *   Unix/Linux - SPRINT is designed for HPC systems and these all run on 
     Unix/Linux.
+*   Mac OSX may be used instead of Unix/Linux. XCode command line tools 
+	must be installed to provide C and Fortran compilers.
+ 
     
 The ff package is also needed when using the pcor() function or when using 
 SPRINT functions on ff objects, for example papply() accepts ff objects as 
@@ -37,12 +40,17 @@ Therefore help from your system administrator may be required to ensure that
 the required environment is set up on your HPC system. Running jobs is often 
 only allowed through a batch queue system rather interactively. In such case, 
 R scripts using SPRINT will need to be submitted to the batch queue using the 
-appropriate utility specific to your HPC system (i.e. mpiexec, qsub).
-
-SPRINT has been successfully installed on Mac architectures but it has not 
-been fully tested. 
+appropriate utility specific to your HPC system (i.e. mpiexec, qsub). 
    
                                  INSTALLATION
+
+SPRINT depends on several packages which must be installed first as follows:
+> R
+install.packages('rlecuyer')
+install.packages('boot')
+install.packages('e1071')
+source("http://bioconductor.org/biocLite.R")
+biocLite("ShortRead")
 
 SPRINT is distributed as a single compressed tar file. All source files are 
 included in one single directory called 'sprint'. The installation process is 

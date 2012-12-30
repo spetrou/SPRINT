@@ -31,7 +31,9 @@ test.tn <- function() {
   set.seed(88)
   a = boot(trees, tnfunction, 1000)
   set.seed(88)
-  b = pboot(trees, tnfunction, 1000)
+	b = pboot(trees, tnfunction, 1000)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"test tn")
 }
 

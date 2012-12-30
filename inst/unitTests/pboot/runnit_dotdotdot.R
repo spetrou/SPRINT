@@ -10,7 +10,9 @@ test.dotdotdot <-function(){
  set.seed(27)
  b = boot(discoveries, dotdotdot, R=100, b=33,pi=63)
  set.seed(27)
- a = pboot(discoveries, dotdotdot, R=100, b=33,pi=63)
+	a = pboot(discoveries, dotdotdot, R=100, b=33,pi=63)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"Two extra variables passed via ...")
 }
 
@@ -24,32 +26,42 @@ test.ddd <- function(){
  set.seed(27)
  a = boot(discoveries, ddd, R=100, mydd = 33)
  set.seed(27)
- b = pboot(discoveries, ddd, R=100, mydd = 33)
+	b = pboot(discoveries, ddd, R=100, mydd = 33)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"interger passed via ...")
  
  set.seed(27)
  a = boot(discoveries, ddd, R=100, mydd = discoveries) 
  set.seed(27)
- b = pboot(discoveries, ddd, R=100, mydd = discoveries)
+	b = pboot(discoveries, ddd, R=100, mydd = discoveries)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"vector passed via ...")
  
  
  set.seed(27)
  a = boot(discoveries, ddd, R=200, mydd = trees$Girth)
  set.seed(27)
- b = pboot(discoveries, ddd, R=200, mydd = trees$Girth)
+	b = pboot(discoveries, ddd, R=200, mydd = trees$Girth)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"label passed via ...")
  
  set.seed(27)
  a = boot(discoveries, ddd, R=100, mydd = seq(50))
  set.seed(27)
- b = pboot(discoveries, ddd, R=100, mydd = seq(50))
+	b = pboot(discoveries, ddd, R=100, mydd = seq(50))
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"expression passed via ...")
  
  set.seed(27)
  a = boot(discoveries, ddd, R=100, mydd = trees[,1])
  set.seed(27)
- b = pboot(discoveries, ddd, R=100, mydd = trees[,1])
+	b = pboot(discoveries, ddd, R=100, mydd = trees[,1])
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"dataframe row passed via ...")
 }
 
@@ -62,7 +74,9 @@ test.ddddataframe <- function(){
  set.seed(27)
  a = boot(discoveries, ddddataframe, R=100, b=trees)
  set.seed(27)
- b = pboot(discoveries, ddddataframe, R=100, b=trees)
+	b = pboot(discoveries, ddddataframe, R=100, b=trees)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
  checkEquals(a,b,"dataframe passed via ...")
 }
 
@@ -103,6 +117,8 @@ test.nuke <- function(){
   set.seed(27) 
   a <- boot(nuke.data, nuke.fun, R=999, m=1, fit.pred=new.fit, x.pred=new.data)
   set.seed(27) 
-  b <- boot(nuke.data, nuke.fun, R=999, m=1, fit.pred=new.fit, x.pred=new.data)
+	b <- boot(nuke.data, nuke.fun, R=999, m=1, fit.pred=new.fit, x.pred=new.data)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"nuke test from the boot man page")
 }
