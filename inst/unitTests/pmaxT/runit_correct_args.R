@@ -27,7 +27,7 @@
 
 test.correct_args <- function() {
 
-    size_of_rows <- 150
+    size_of_rows <- 10
 
     # Load test data and class label
     data(golub)

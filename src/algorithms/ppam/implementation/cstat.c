@@ -257,8 +257,8 @@ void cstat(int my_rank, int world_size, int my_start, int my_end, int n_clusters
                    n_clusters, MPI_COMM_WORLD);
       mMPI_AllgatherDOUBLE(separ, world_size, my_rank, my_kk_start, my_kk_end,
                    n_clusters, MPI_COMM_WORLD);
-//      mMPI_AllgatherINT(nisol, world_size, my_rank, my_kk_start, my_kk_end,
-//                   n_clusters, MPI_COMM_WORLD);
+      mMPI_AllgatherINT(nisol, world_size, my_rank, my_kk_start, my_kk_end,
+                   n_clusters, MPI_COMM_WORLD);
       mMPI_AllgatherINT(nrepr, world_size, my_rank, my_kk_start, my_kk_end,
                    n_clusters, MPI_COMM_WORLD);
 

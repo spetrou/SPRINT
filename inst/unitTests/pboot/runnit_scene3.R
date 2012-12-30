@@ -30,25 +30,33 @@ test.stypefm3 <- function() {
   set.seed(88)
   a = boot(discoveries, stypefm3, 1001, stype="f", m=1)
   set.seed(88)
-  b = pboot(discoveries, stypefm3, 1001, stype="f", m=1)
+	b = pboot(discoveries, stypefm3, 1001, stype="f", m=1)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = f and m is 1")
 
  set.seed(88)
   a = boot(discoveries, stypefm3, 1001, stype="f", m=2)
   set.seed(88)
-  b = pboot(discoveries, stypefm3, 1001, stype="f", m=2)
+	b = pboot(discoveries, stypefm3, 1001, stype="f", m=2)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = f and m is 2")
 
  set.seed(88)
   a = boot(discoveries, stypefm3, 1001, stype="f", m=4)
   set.seed(88)
-  b = pboot(discoveries, stypefm3, 1001, stype="f", m=4)
+	b = pboot(discoveries, stypefm3, 1001, stype="f", m=4)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = f and m is 4")
 
  set.seed(88)
   a = boot(discoveries, stypefm3, 1001, stype="f", m=16)
   set.seed(88)
-  b = pboot(discoveries, stypefm3, 1001, stype="f", m=16)
+	b = pboot(discoveries, stypefm3, 1001, stype="f", m=16)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = f and m is 1")
 
 }

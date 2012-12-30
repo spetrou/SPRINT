@@ -1,5 +1,6 @@
 \name{prandomForest}
 \alias{prandomForest}
+\alias{prandomForest.default}
 \title{Parallel random forest generation}
 \description{
 The machine learning function prandomForest() is an ensemble tree classifier 
@@ -11,17 +12,7 @@ package.
 } 
 \usage{
 prandomForest(x, ...)
-}
-\arguments{
-  \item{x}{array of data}
-  \item{...}{optional parameters to be passed to the low level function
-               randomForest.default.}
-}
-\details{
-prandomForest use relies on typical usage of the underlying randomForest 
-function. The default paramaters are:
-    \preformatted{
-        prandomForest(x, y=NULL, xtest=NULL, ytest=NULL, ntree=500, 
+\method{prandomForest}{default}(x, y=NULL, xtest=NULL, ytest=NULL, ntree=500, 
                       mtry = if (!is.null(y) && !is.factor(y))
                                  max(floor(ncol(x)/3), 1) 
                              else floor(sqrt(ncol(x))),
@@ -35,6 +26,12 @@ function. The default paramaters are:
                       keep.forest = !is.null(y) && is.null(xtest), 
                       corr.bias=FALSE, keep.inbag=FALSE, ...)
 
+}
+
+\arguments{
+  \item{x}{array of data}
+  \item{...}{optional parameters to be passed to the low level function
+               randomForest.default.} 
         \item{y}{vector, if a factor, classification is assumed, otherwise 
                  regression is assumed. If omitted, prandomForest() will run 
                  in unsupervised mode.}
@@ -90,10 +87,8 @@ function. The default paramaters are:
         \item{keep.inbag}{boolean, whether the matrix which keeps track of 
                           which samples are in-bag in which trees should be 
                           returned. The default value is FALSE.}
-        \item{...}{optional parameters to be passed to the low level function 
-                   randomForest.default.}
-        }
 }
+
 \seealso{
     \code{\link[randomForest]{randomForest}}
     \code{\link{SPRINT}}

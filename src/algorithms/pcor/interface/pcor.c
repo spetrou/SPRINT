@@ -83,6 +83,7 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
         UNPROTECT(1);
         return result;
       }
+
       if (!IS_NUMERIC(data_y) && !IS_INTEGER(data_y)) {
         ERR("\npcor.c accepts only numeric matrices (data_y)\n");
         INTEGER(result)[0] = -1;
@@ -90,7 +91,7 @@ SEXP pcor(SEXP data_x, SEXP data_y, SEXP out_file, SEXP distance)
         return result;
       }
     }
-    
+
     // Get number of genes and samples
     // Also get the name of the input and output files
     dataSize = GET_DIM(data_x);

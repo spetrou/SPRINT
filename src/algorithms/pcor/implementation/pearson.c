@@ -9,8 +9,8 @@
 
 #include "pearson.h"
 
-void pearson_row(const double *data, const int row_x, double *result,
-                 const int rows, const int columns, const double *Sxx_vector)
+int pearson_row(const double *data, const int row_x, double *result,
+                const int rows, const int columns, const double *Sxx_vector)
 {
     int i, j;
     double sxy = 0.0;
@@ -20,7 +20,7 @@ void pearson_row(const double *data, const int row_x, double *result,
     if ( columns <= 0 || rows <= 0) {
         printf("\nRow/column size passed to \"pearson\" function invalid.\n");
         printf("\nValues remain as they were before the call.\n");
-        return;
+        return -1;
     }
 
     // Set pointer to the row the array is compared against
@@ -47,6 +47,8 @@ void pearson_row(const double *data, const int row_x, double *result,
         // sxy = 0 - this replicates R's behaviour
         result[i] = sxy / sqrt(Sxx_vector[row_x]*Sxx_vector[j]);
     }
+
+    return rows;
 }
 
 

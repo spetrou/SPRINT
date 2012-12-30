@@ -31,7 +31,9 @@ test.stypew <- function() {
   set.seed(88)
   a = boot(city, stypewfun, 4638, stype="w")
   set.seed(88)
-  b = pboot(city, stypewfun, 4638, stype="w")
+	b = pboot(city, stypewfun, 4638, stype="w")
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = w ")
 
 }
@@ -40,25 +42,33 @@ test.stypewm <- function() {
   set.seed(88)
   a = boot(city, stypewmfun, 1638, stype="w", m=1)
   set.seed(88)
-  b = pboot(city, stypewmfun, 1638, stype="w", m=1)
+	b = pboot(city, stypewmfun, 1638, stype="w", m=1)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = w m=1")
 
   set.seed(88)
   a = boot(city, stypewmfun, 638, stype="w", m=2)
   set.seed(88)
-  b = pboot(city, stypewmfun, 638, stype="w", m=2)
+	b = pboot(city, stypewmfun, 638, stype="w", m=2)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = w m=2")
 
   set.seed(88)
   a = boot(city, stypewmfun, 638, stype="w", m=8)
   set.seed(88)
-  b = pboot(city, stypewmfun, 638, stype="w", m=8)
+	b = pboot(city, stypewmfun, 638, stype="w", m=8)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = w m=8")
 
   set.seed(88)
   a = boot(city, stypewmfun, 468, stype="w", m=16)
   set.seed(88)
-  b = pboot(city, stypewmfun, 468, stype="w", m=16)
+	b = pboot(city, stypewmfun, 468, stype="w", m=16)
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test type = w m=16")
 
 }

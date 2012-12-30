@@ -124,7 +124,7 @@ int pamedoids(int n,...) {
     ncluv = (int *) R_alloc(n_rows, sizeof(int));
     clusinf = (double *) R_alloc(n_clusters*5, sizeof(double));
     sylinf = (double *) R_alloc(n_rows*4, sizeof(double));
-    nisol = (int*) R_alloc(1, sizeof(int));
+    nisol = (int*) R_alloc(n_clusters, sizeof(int));
 
     if ( (nsend == NULL) || (nrepr == NULL) || (nelem == NULL) || (radus == NULL) ||
          (damer == NULL) || (avsyl == NULL) || (separ == NULL) || (ttsyl == NULL) ||
@@ -169,16 +169,19 @@ int pamedoids(int n,...) {
   MPI_Bcast(ttsyl, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(obj, 2, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(med, n_clusters, MPI_INT, 0, MPI_COMM_WORLD);
-  MPI_Bcast(ncluv, n_clusters, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(ncluv, n_rows, MPI_INT, 0, MPI_COMM_WORLD);
   MPI_Bcast(clusinf, n_clusters*5, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   MPI_Bcast(sylinf, n_rows*4, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-  MPI_Bcast(nisol, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast(nisol, n_clusters, MPI_INT, 0, MPI_COMM_WORLD);
 
   /* Local variables */
-  all_stats = (obj[0] == 0.),        /* if false, only return 'ncluv[]' */
-    med_given = (med[0] != 0),       /* if true, med[] contain initial medoids */
-    do_swap = (nisol[0] != 0);
+  all_stats = (obj[0] == 0.);   /* if false, only return 'ncluv[]' */
+  med_given = (med[0] != 0); /* if true, med[] contain initial medoids */
+  do_swap = (nisol[0] != 0);
 
+  /* We've figured out if we should do swapping, so initialise nisol
+   * correctly */
+  nisol[0] = 0;
   clusinf_dim1 = n_clusters;
   
   /* initialise medoids before broadcasting nrepr array */

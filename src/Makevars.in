@@ -6,6 +6,7 @@
 # *  that are related and needed by MPI.                                   *
 # * ********************************************************************** *
 MPICC    = @MPICC@
+MPICXX   = @MPICXX@
 MPILIBS  = @MPILIBS@
 PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
 PKG_LIBS = $(SHLIB_OPENMP_CFLAGS)

@@ -38,7 +38,9 @@ test.standard <- function() {
   set.seed(88)
   b = pboot(discoveries, myfunction, 1001)
   a
-  b
+	b
+# Ignore the calls having different names when testing equality.
+	b$call <- a$call 
   checkEquals(a,b,"Test 0")
 }
 

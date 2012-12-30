@@ -23,10 +23,11 @@
  *  @param  rows        Count of rows.
  *  @param  columns     Count of columns.
  *  @param  Sxx_vector  Pointer to the expected values array.
- *
+ *  @return The number of coefficients computed. Negative on error.
  */
-void pearson_row(const double *data, const int row_x, double *result,
-                 const int rows, const int columns, const double *Sxx_vector);
+int pearson_row(const double *data, const int row_x, double *result,
+                const int rows, const int columns,
+                const double *Sxx_vector);
 
 
 /*!
